@@ -1,0 +1,4 @@
+Settings[Keys.Host] = "msbuildpipelogger.netlify.com";
+Settings[DocsKeys.Title] = "MsBuildPipeLogger";
+Settings[DocsKeys.SourceFiles] = "../../src/**/*.cs";
+Settings[DocsKeys.ProcessIncludes] = true;

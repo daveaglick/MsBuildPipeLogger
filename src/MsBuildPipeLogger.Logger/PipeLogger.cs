@@ -7,7 +7,7 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 using Microsoft.Build.Utilities;
 
-namespace MsBuildPipeLogger.Logger
+namespace MsBuildPipeLogger
 {
     /// <summary>
     /// Logger to send messages from the MSBuild logging system over an anonymous pipe.

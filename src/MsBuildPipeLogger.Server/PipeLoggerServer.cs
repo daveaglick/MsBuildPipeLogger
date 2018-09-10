@@ -7,7 +7,7 @@ using System.IO.Pipes;
 using System.Reflection;
 using System.Text;
 
-namespace MsBuildPipeLogger.Server
+namespace MsBuildPipeLogger
 {
     public class PipeLoggerServer : EventArgsDispatcher, IDisposable
     {

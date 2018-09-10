@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using Microsoft.Build.Framework;
-using MsBuildPipeLogger.Logger;
+using MsBuildPipeLogger;
 
 namespace Microsoft.Build.Logging
 {

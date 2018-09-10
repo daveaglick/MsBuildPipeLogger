@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 
-namespace MsBuildPipeLogger.Logger
+namespace MsBuildPipeLogger
 {
     internal static class TypeExtensions
     {

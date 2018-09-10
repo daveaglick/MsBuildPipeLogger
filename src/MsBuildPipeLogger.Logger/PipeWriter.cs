@@ -8,7 +8,7 @@ namespace MsBuildPipeLogger
 {
     internal abstract class PipeWriter : IDisposable
     {
-        private PipeStream _pipe;
+        private PipeStream _pipeStream;
         private BinaryWriter _binaryWriter;
         private BuildEventArgsWriter _argsWriter;
 
@@ -16,29 +16,29 @@ namespace MsBuildPipeLogger
 
         public void Dispose()
         {
-            if (_pipe != null)
+            if (_pipeStream != null)
             {
                 try
                 {
-                    _pipe.WaitForPipeDrain();
+                    _pipeStream.WaitForPipeDrain();
                     _binaryWriter.Dispose();
-                    _pipe.Dispose();
+                    _pipeStream.Dispose();
                 }
                 catch { }
-                _pipe = null;
+                _pipeStream = null;
             }
         }
 
         public void Write(BuildEventArgs e)
         {
-            if(_pipe == null)
+            if(_pipeStream == null)
             {
-                _pipe = InitializePipe();
-                if(_pipe == null)
+                _pipeStream = InitializePipe();
+                if(_pipeStream == null)
                 {
                     throw new LoggerException("Could not initialize pipe");
                 }
-                _binaryWriter = new BinaryWriter(_pipe);
+                _binaryWriter = new BinaryWriter(_pipeStream);
                 _argsWriter = new BuildEventArgsWriter(_binaryWriter);
             }
             _argsWriter.Write(e);

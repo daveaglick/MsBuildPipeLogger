@@ -9,5 +9,8 @@
     <PackageReference Include="NUnit3TestAdapter" Version="3.10.0" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
   </ItemGroup>
-
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\MsBuildPipeLogger.Server\MsBuildPipeLogger.Server.csproj" />
+  </ItemGroup>
+  
 </Project>

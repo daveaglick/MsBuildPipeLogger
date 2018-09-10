@@ -1,12 +1,25 @@
-﻿using System;
+﻿using Microsoft.Build.Framework;
+using System;
+using System.Diagnostics;
 
 namespace MsBuildPipeLogger.Tests.Client
 {
-    class Program
+    public class Program
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            Console.WriteLine(string.Join("; ", args));
+            try
+            {
+                using (PipeWriter writer = ParameterParser.GetPipeFromParameters(args[0]))
+                {
+                    writer.Write(new BuildStartedEventArgs("Testing 123", "help"));
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.Error.WriteLine(ex.ToString());
+            }
         }
     }
 }

@@ -22,10 +22,13 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsBuildPipeLogger.Server", "src\MsBuildPipeLogger.Server\MsBuildPipeLogger.Server.csproj", "{19286807-751C-43CE-891A-6E9B9CB7200C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsBuildPipeLogger.Tests", "tests\MsBuildPipeLogger.Tests\MsBuildPipeLogger.Tests.csproj", "{F70DD8B5-DAE2-4D6F-9BBC-A0E64378EAA1}"
+	ProjectSection(ProjectDependencies) = postProject
+		{2C6D9150-3CA3-4499-A08C-98A12F76757F} = {2C6D9150-3CA3-4499-A08C-98A12F76757F}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsBuildPipeLogger.Tests.Client", "tests\MsBuildPipeLogger.Tests.Client\MsBuildPipeLogger.Tests.Client.csproj", "{2C6D9150-3CA3-4499-A08C-98A12F76757F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MsBuildPipeLogger.Logger.Tests", "tests\MsBuildPipeLogger.Logger.Tests\MsBuildPipeLogger.Logger.Tests.csproj", "{65721127-A8F7-4DA0-9FAF-1D028C4A6900}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsBuildPipeLogger.Logger.Tests", "tests\MsBuildPipeLogger.Logger.Tests\MsBuildPipeLogger.Logger.Tests.csproj", "{65721127-A8F7-4DA0-9FAF-1D028C4A6900}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

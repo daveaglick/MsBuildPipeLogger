@@ -19,7 +19,11 @@ namespace MsBuildPipeLogger
             PipeName = pipeName;
         }
 
-        protected override PipeStream InitializePipe() =>
-            new NamedPipeClientStream(ServerName, PipeName, PipeDirection.Out);
+        protected override PipeStream InitializePipe()
+        {
+            NamedPipeClientStream pipeStream = new NamedPipeClientStream(ServerName, PipeName, PipeDirection.Out);
+            pipeStream.Connect();
+            return pipeStream;
+        }
     }
 }

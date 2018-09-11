@@ -9,6 +9,10 @@ using System.Text;
 
 namespace MsBuildPipeLogger
 {
+    /// <summary>
+    /// Receives MSBuild logging events over a pipe. This is the base class for <see cref="AnonymousPipeLoggerServer"/>
+    /// and <see cref="NamedPipeLoggerServer"/>.
+    /// </summary>
     public class PipeLoggerServer : EventArgsDispatcher, IDisposable
     {
         // This comes from https://github.com/KirillOsenkov/MSBuildStructuredLog/blob/master/src/StructuredLogger/BinaryLogger/BinaryLogger.cs
@@ -18,6 +22,10 @@ namespace MsBuildPipeLogger
         private readonly BinaryReader _binaryReader;
         private readonly Func<BuildEventArgs> _read;
         
+        /// <summary>
+        /// Creates a server that receives MSBuild events over a specified pipe.
+        /// </summary>
+        /// <param name="pipeStream">The pipe to receive events from.</param>
         public PipeLoggerServer(PipeStream pipeStream)
         {
             PipeStream = pipeStream;
@@ -42,6 +50,11 @@ namespace MsBuildPipeLogger
 
         protected PipeStream PipeStream { get; }
 
+        /// <summary>
+        /// Reads a single event from the pipe. This method blocks until an event is received,
+        /// there are no more events, or the pipe is closed.
+        /// </summary>
+        /// <returns><c>true</c> if an event was read, <c>false</c> otherwise.</returns>
         public virtual bool Read()
         {
             // Now read one message from the stream
@@ -61,6 +74,7 @@ namespace MsBuildPipeLogger
             return false;
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             _binaryReader.Dispose();

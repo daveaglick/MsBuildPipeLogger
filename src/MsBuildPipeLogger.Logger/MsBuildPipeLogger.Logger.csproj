@@ -3,6 +3,13 @@
   <PropertyGroup>
     <TargetFrameworks>netstandard1.3</TargetFrameworks>
     <RootNamespace>MsBuildPipeLogger</RootNamespace>
+    <Authors>Dave Glick</Authors>
+    <Company>Dave Glick</Company>
+    <Product />
+    <Description>A logger for MSBuild that sends event data over anonymous or named pipes.</Description>
+    <PackageProjectUrl>https://msbuildpipelogger.netlify.com/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/daveaglick/MsBuildPipeLogger.git</RepositoryUrl>
+    <PackageLicenseUrl>https://github.com/daveaglick/MsBuildPipeLogger/blob/master/LICENSE</PackageLicenseUrl>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" Version="14.3.0" PrivateAssets="All" />

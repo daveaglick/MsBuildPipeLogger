@@ -1,6 +1,21 @@
-# MsBuildPipeLogger
-
 A logger for MSBuild that sends event data over anonymous or named pipes.
+
+**NuGet**
+* [MsBuildPipeLogger.Logger](https://www.nuget.org/packages/MsBuildPipeLogger.Logger/)
+* [MsBuildPipeLogger.Server](https://www.nuget.org/packages/MsBuildPipeLogger.Server/)
+
+**MyGet**
+* [MsBuildPipeLogger.Logger](https://www.myget.org/feed/msbuildpipelogger/package/nuget/MsBuildPipeLogger.Logger)
+* [MsBuildPipeLogger.Server](https://www.myget.org/feed/msbuildpipelogger/package/nuget/MsBuildPipeLogger.Server)
+
+**GitHub**
+* [MsBuildPipeLogger](https://github.com/daveaglick/MsBuildPipeLogger)
+
+**Donations**
+
+<a href="https://www.buymeacoffee.com/daveaglick"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: auto !important;width: auto !important;" ></a>
+
+---
 
 ## Say what?
 
@@ -13,6 +28,10 @@ This project is heavily based on the amazing work done by @KirillOsenkov on [MSB
 I wrote this to address a need I had in [Buildalyzer](https://github.com/daveaglick/Buildalyzer) to access MSBuild properties from out-of-process MSBuild instances. In that use case, you can use `MsBuildPipeLogger` with a forked MSBuild instance to send logging events back to your original process where they can be operated on. I'm sure there are other use cases such as remote log aggregation. Drop me a line if you find this logger helpful and let me know what you're up to.
 
 ## How do I use it?
+
+There are two libraries:
+* [MsBuildPipeLogger.Logger](https://www.nuget.org/packages/MsBuildPipeLogger.Logger/) - the logger that's given to MSBuild.
+* [MsBuildPipeLogger.Server](https://www.nuget.org/packages/MsBuildPipeLogger.Server/) - the server that receives logging events from the pipe and raises them to your code.
 
 Usage consists of creating a server to receive logging events and then telling MSBuild to use the `MsBuildPipeLogger`. It's slightly different depending on if you want to use an [anonymous pipe](https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-use-anonymous-pipes-for-local-interprocess-communication) or a [named pipe](https://docs.microsoft.com/en-us/dotnet/standard/io/how-to-use-named-pipes-for-network-interprocess-communication).
 
@@ -85,5 +104,7 @@ The `MsBuildPipeLogger.Logger` recognizes these parameters, separated by a `;` a
 * `name` indicates the named pipe name: `MsBuildPipeLogger.Logger,MsBuildPipeLogger.Logger.dll;name=Mario`
 * `server` indicates the named pipe server (assumed to be a local pipe if omitted): `MsBuildPipeLogger.Logger,MsBuildPipeLogger.Logger.dll;name=Mario;server=MyServerName`
 
----
-This project is maintained by Dave Glick ([@daveaglick](https://github.com/daveaglick))
+### A note on concurrency
+
+The `AnonymousPipeLoggerServer.Read()` and `NamedPipeLoggerServer.Read()` methods both block while waiting for additional events. If you need to support concurrency or cancellation, you'll need to wrap this call however is appropriate for your application.
+

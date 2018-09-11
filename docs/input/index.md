@@ -1,3 +1,4 @@
-Title: MsBuildPipeLogger
+Title: Home
+NoTitle: true
 ---
 ^"../../README.md"

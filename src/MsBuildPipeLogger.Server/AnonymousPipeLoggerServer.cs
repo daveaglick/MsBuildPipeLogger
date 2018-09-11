@@ -4,7 +4,7 @@ using System.IO.Pipes;
 namespace MsBuildPipeLogger
 {
     /// <summary>
-    /// An server for receiving MSBuild logging events over an anonymous pipe.
+    /// A server for receiving MSBuild logging events over an anonymous pipe.
     /// </summary>
     public class AnonymousPipeLoggerServer : PipeLoggerServer
     {

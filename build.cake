@@ -213,6 +213,7 @@ Task("NuGet")
 
 Task("GitHub")
     .Description("Generates a release on GitHub.")
+    .IsDependentOn("Pack")
     .IsDependentOn("Zip")
     .WithCriteria(() => isLocal)
     .Does(() =>

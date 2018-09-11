@@ -3,7 +3,7 @@
 namespace MsBuildPipeLogger
 {
     /// <summary>
-    /// An server for receiving MSBuild logging events over a named pipe.
+    /// A server for receiving MSBuild logging events over a named pipe.
     /// </summary>
     public class NamedPipeLoggerServer : PipeLoggerServer
     {

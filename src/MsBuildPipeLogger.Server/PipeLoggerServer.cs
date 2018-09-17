@@ -4,8 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
-using System.Reflection;
 using System.Text;
+using System.Threading;
 
 namespace MsBuildPipeLogger
 {
@@ -15,13 +15,12 @@ namespace MsBuildPipeLogger
     /// </summary>
     public class PipeLoggerServer : EventArgsDispatcher, IDisposable
     {
-        // This comes from https://github.com/KirillOsenkov/MSBuildStructuredLog/blob/master/src/StructuredLogger/BinaryLogger/BinaryLogger.cs
-        // It should match the version of the files that were copied into MsBuildPipeLogger.Logger from MSBuildStructuredLog
-        private const int FileFormatVersion = 7;
-
+        private readonly PipeBuffer _buffer = new PipeBuffer();
         private readonly BinaryReader _binaryReader;
-        private readonly Func<BuildEventArgs> _read;
+        private readonly BuildEventArgsReaderProxy _buildEventArgsReader;
         
+        protected PipeStream PipeStream { get; }
+
         /// <summary>
         /// Creates a server that receives MSBuild events over a specified pipe.
         /// </summary>
@@ -29,47 +28,51 @@ namespace MsBuildPipeLogger
         public PipeLoggerServer(PipeStream pipeStream)
         {
             PipeStream = pipeStream;
-            _binaryReader = new BinaryReader(PipeStream);
+            _binaryReader = new BinaryReader(_buffer);
+            _buildEventArgsReader = new BuildEventArgsReaderProxy(_binaryReader);
 
-            // Use reflection to get the Microsoft.Build.Logging.BuildEventArgsReader.Read() method
-            object argsReader;
-            Type buildEventArgsReader = typeof(BinaryLogger).GetTypeInfo().Assembly.GetType("Microsoft.Build.Logging.BuildEventArgsReader");
-            ConstructorInfo readerCtor = buildEventArgsReader.GetConstructor(new[] { typeof(BinaryReader) });
-            if(readerCtor != null)
+            new Thread(() =>
             {
-                argsReader = readerCtor.Invoke(new[] { _binaryReader });
-            }
-            else
-            {
-                readerCtor = buildEventArgsReader.GetConstructor(new[] { typeof(BinaryReader), typeof(int) });
-                argsReader = readerCtor.Invoke(new object[] { _binaryReader, 7 });
-            }
-            MethodInfo readMethod = buildEventArgsReader.GetMethod("Read");
-            _read = (Func<BuildEventArgs>)readMethod.CreateDelegate(typeof(Func<BuildEventArgs>), argsReader);
+                Connect();
+                try
+                {
+                    while(_buffer.Write(PipeStream))
+                    {
+                    }
+                }
+                catch (EndOfStreamException)
+                {
+                    // The client broke the stream so we're done
+                }
+
+                // Add a final 0 (BinaryLogRecordKind.EndOfFile) into the stream in case the BuildEventArgsReader is waiting for a read
+                _buffer.Write(new byte[1] { 0 }, 0, 1);
+
+                _buffer.CompleteAdding();
+            }).Start();
         }
 
-        protected PipeStream PipeStream { get; }
+        protected virtual void Connect()
+        {
+        }
 
         /// <summary>
         /// Reads a single event from the pipe. This method blocks until an event is received,
         /// there are no more events, or the pipe is closed.
         /// </summary>
         /// <returns><c>true</c> if an event was read, <c>false</c> otherwise.</returns>
-        public virtual bool Read()
+        public bool Read()
         {
-            // Now read one message from the stream
-            try
+            if(_buffer.IsCompleted)
             {
-                BuildEventArgs args = _read();
-                if (args != null)
-                {
-                    Dispatch(args);
-                    return true;
-                }
+                return false;
             }
-            catch(EndOfStreamException)
+
+            BuildEventArgs args = _buildEventArgsReader.Read();
+            if (args != null)
             {
-                // Nothing else to read
+                Dispatch(args);
+                return true;
             }
             return false;
         }

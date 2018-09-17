@@ -15,10 +15,14 @@
     <PackageReference Include="Microsoft.Build" Version="14.3.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.Build.Utilities.Core" Version="14.3.0" PrivateAssets="All" />
     <PackageReference Include="System.IO.Pipes" Version="4.3.0" />
+    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
   </ItemGroup>
   <ItemGroup>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>MsBuildPipeLogger.Logger.Tests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>MsBuildPipeLogger.Tests</_Parameter1>
     </AssemblyAttribute>
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>MsBuildPipeLogger.Tests.Client</_Parameter1>

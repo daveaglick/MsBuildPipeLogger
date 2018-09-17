@@ -7,21 +7,17 @@ namespace MsBuildPipeLogger
 {
     internal static class ParameterParser
     {
-        public static PipeWriter GetPipeFromParameters(string rawParameters)
+        internal enum ParameterType
         {
-            // Get the parameter components
-            string[] parameters = rawParameters.Split(';');
-            if(parameters.Length < 1 || parameters.Length > 2)
-            {
-                throw new LoggerException("Unexpected number of parameters");
-            }
-
-            // Process the parameters
-            return ProcessParameters(parameters.Select(x => ParseParameter(x)).ToArray());
+            Handle,
+            Name,
+            Server
         }
 
-        private static PipeWriter ProcessParameters(KeyValuePair<ParameterType, string>[] parameters)
+        public static PipeWriter GetPipeFromParameters(string rawParameters)
         {
+            KeyValuePair<ParameterType, string>[] parameters = ParseParameters(rawParameters);
+
             if (parameters.Any(x => string.IsNullOrWhiteSpace(x.Value)))
             {
                 throw new LoggerException($"Invalid or empty parameter value");
@@ -38,23 +34,33 @@ namespace MsBuildPipeLogger
             }
 
             // Named pipe
-            if(parameters[0].Key == ParameterType.Name)
+            if (parameters[0].Key == ParameterType.Name)
             {
-                if(parameters.Length == 1)
+                if (parameters.Length == 1)
                 {
                     return new NamedPipeWriter(parameters[0].Value);
                 }
-                if(parameters[1].Key != ParameterType.Server)
+                if (parameters[1].Key != ParameterType.Server)
                 {
                     throw new LoggerException("Only server and name can be specified for a named pipe");
                 }
                 return new NamedPipeWriter(parameters[1].Value, parameters[0].Value);
             }
-            if(parameters.Length == 1 || parameters[1].Key != ParameterType.Name)
+            if (parameters.Length == 1 || parameters[1].Key != ParameterType.Name)
             {
                 throw new LoggerException("Pipe name must be specified for a named pipe");
             }
             return new NamedPipeWriter(parameters[0].Value, parameters[1].Value);
+        }
+
+        internal static KeyValuePair<ParameterType, string>[] ParseParameters(string rawParameters)
+        {
+            string[] parameters = rawParameters.Split(';');
+            if (parameters.Length < 1 || parameters.Length > 2)
+            {
+                throw new LoggerException("Unexpected number of parameters");
+            }
+            return parameters.Select(x => ParseParameter(x)).ToArray();
         }
 
         private static KeyValuePair<ParameterType, string> ParseParameter(string parameter)
@@ -74,13 +80,6 @@ namespace MsBuildPipeLogger
                 throw new LoggerException($"Invalid parameter name {parts[0]}");
             }
             return new KeyValuePair<ParameterType, string>(parameterType, string.Join("=", parts.Skip(1)).Trim());
-        }
-
-        private enum ParameterType
-        {
-            Handle,
-            Name,
-            Server
         }
     }
 }

@@ -22,30 +22,46 @@ namespace MsBuildPipeLogger.Logger.Tests
         public void GetsAnonymousPipe(string parameters)
         {
             // Given, When
-            AnonymousPipeWriter writer = ParameterParser.GetPipeFromParameters(parameters) as AnonymousPipeWriter;
+            KeyValuePair<ParameterParser.ParameterType, string>[] parts = ParameterParser.ParseParameters(parameters);
 
             // Then
-            writer.ShouldNotBeNull();
-            writer.Handle.ShouldBe("1234");            
+            parts.ShouldBe(new KeyValuePair<ParameterParser.ParameterType, string>[]
+            {
+                new KeyValuePair<ParameterParser.ParameterType, string>(ParameterParser.ParameterType.Handle, "1234")
+            });
         }
 
         [TestCase("name=Foo")]
         [TestCase("\"name=Foo\"")]
         [TestCase("NAME=Foo")]
         [TestCase(" name = Foo ")]
+        public void GetsNamedPipe(string parameters)
+        {
+            // Given, When
+            KeyValuePair<ParameterParser.ParameterType, string>[] parts = ParameterParser.ParseParameters(parameters);
+
+            // Then
+            parts.ShouldBe(new KeyValuePair<ParameterParser.ParameterType, string>[]
+            {
+                new KeyValuePair<ParameterParser.ParameterType, string>(ParameterParser.ParameterType.Name, "Foo")
+            });
+        }
+
         [TestCase("name=Foo;server=Bar")]
         [TestCase("\"name=Foo;server=Bar\"")]
         [TestCase("NAME=Foo;SERVER=Bar")]
         [TestCase(" name = Foo ; server = Bar")]
-        public void GetsNamedPipe(string parameters)
+        public void GetsNamedPipeWithServer(string parameters)
         {
             // Given, When
-            NamedPipeWriter writer = ParameterParser.GetPipeFromParameters(parameters) as NamedPipeWriter;
+            KeyValuePair<ParameterParser.ParameterType, string>[] parts = ParameterParser.ParseParameters(parameters);
 
             // Then
-            writer.ShouldNotBeNull();
-            writer.PipeName.ShouldBe("Foo");
-            writer.ServerName.ShouldBe(parameters.Contains("server", StringComparison.OrdinalIgnoreCase) ? "Bar" : ".");
+            parts.ShouldBe(new KeyValuePair<ParameterParser.ParameterType, string>[]
+            {
+                new KeyValuePair<ParameterParser.ParameterType, string>(ParameterParser.ParameterType.Name, "Foo"),
+                new KeyValuePair<ParameterParser.ParameterType, string>(ParameterParser.ParameterType.Server, "Bar")
+            }, true);
         }
 
         [TestCase("")]

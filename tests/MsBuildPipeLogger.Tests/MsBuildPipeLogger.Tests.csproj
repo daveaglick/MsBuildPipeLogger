@@ -10,6 +10,7 @@
     <PackageReference Include="Shouldly" Version="3.0.0" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\MsBuildPipeLogger.Logger\MsBuildPipeLogger.Logger.csproj" />
     <ProjectReference Include="..\..\src\MsBuildPipeLogger.Server\MsBuildPipeLogger.Server.csproj" />
   </ItemGroup>
   

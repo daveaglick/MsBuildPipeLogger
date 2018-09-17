@@ -26,18 +26,16 @@ namespace MsBuildPipeLogger
         public string GetClientHandle() =>
             _clientHandle ?? (_clientHandle = ((AnonymousPipeServerStream)PipeStream).GetClientHandleAsString());
 
-        /// <inheritdoc/>
-        public override bool Read()
+        protected override void Connect()
         {
-            // First dispose the client handle if we asked for one
-            // If we don't do this we won't get notified when the stream closes, see https://stackoverflow.com/q/39682602/807064
-            if (_clientHandle != null)
+            while(!((AnonymousPipeServerStream)PipeStream).IsConnected)
             {
-                ((AnonymousPipeServerStream)PipeStream).DisposeLocalCopyOfClientHandle();
-                _clientHandle = null;
             }
 
-            return base.Read();
+            // Dispose the client handle if we asked for one
+            // If we don't do this we won't get notified when the stream closes, see https://stackoverflow.com/q/39682602/807064
+            ((AnonymousPipeServerStream)PipeStream).DisposeLocalCopyOfClientHandle();
+            _clientHandle = null;
         }
     }
 }

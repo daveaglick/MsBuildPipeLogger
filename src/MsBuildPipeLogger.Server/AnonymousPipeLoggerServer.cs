@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.IO.Pipes;
 
 namespace MsBuildPipeLogger
@@ -28,9 +28,8 @@ namespace MsBuildPipeLogger
 
         protected override void Connect()
         {
-            while(!((AnonymousPipeServerStream)PipeStream).IsConnected)
-            {
-            }
+            // Wait for the pipe to send something so we know we're connected
+            Buffer.Write(PipeStream);
 
             // Dispose the client handle if we asked for one
             // If we don't do this we won't get notified when the stream closes, see https://stackoverflow.com/q/39682602/807064

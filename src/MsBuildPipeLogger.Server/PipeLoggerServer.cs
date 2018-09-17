@@ -1,4 +1,4 @@
-﻿using Microsoft.Build.Framework;
+using Microsoft.Build.Framework;
 using Microsoft.Build.Logging;
 using System;
 using System.Collections.Generic;
@@ -15,9 +15,10 @@ namespace MsBuildPipeLogger
     /// </summary>
     public class PipeLoggerServer : EventArgsDispatcher, IDisposable
     {
-        private readonly PipeBuffer _buffer = new PipeBuffer();
         private readonly BinaryReader _binaryReader;
         private readonly BuildEventArgsReaderProxy _buildEventArgsReader;
+        
+        protected PipeBuffer Buffer { get; } = new PipeBuffer();
         
         protected PipeStream PipeStream { get; }
 
@@ -28,7 +29,7 @@ namespace MsBuildPipeLogger
         public PipeLoggerServer(PipeStream pipeStream)
         {
             PipeStream = pipeStream;
-            _binaryReader = new BinaryReader(_buffer);
+            _binaryReader = new BinaryReader(Buffer);
             _buildEventArgsReader = new BuildEventArgsReaderProxy(_binaryReader);
 
             new Thread(() =>
@@ -36,7 +37,7 @@ namespace MsBuildPipeLogger
                 Connect();
                 try
                 {
-                    while(_buffer.Write(PipeStream))
+                    while(Buffer.Write(PipeStream))
                     {
                     }
                 }
@@ -46,9 +47,9 @@ namespace MsBuildPipeLogger
                 }
 
                 // Add a final 0 (BinaryLogRecordKind.EndOfFile) into the stream in case the BuildEventArgsReader is waiting for a read
-                _buffer.Write(new byte[1] { 0 }, 0, 1);
+                Buffer.Write(new byte[1] { 0 }, 0, 1);
 
-                _buffer.CompleteAdding();
+                Buffer.CompleteAdding();
             }).Start();
         }
 
@@ -63,7 +64,7 @@ namespace MsBuildPipeLogger
         /// <returns><c>true</c> if an event was read, <c>false</c> otherwise.</returns>
         public bool Read()
         {
-            if(_buffer.IsCompleted)
+            if(Buffer.IsCompleted)
             {
                 return false;
             }

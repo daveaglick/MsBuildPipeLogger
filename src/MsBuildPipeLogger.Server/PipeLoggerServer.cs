@@ -18,7 +18,7 @@ namespace MsBuildPipeLogger
         private readonly BinaryReader _binaryReader;
         private readonly BuildEventArgsReaderProxy _buildEventArgsReader;
         
-        protected PipeBuffer Buffer { get; } = new PipeBuffer();
+        internal PipeBuffer Buffer { get; } = new PipeBuffer();
         
         protected PipeStream PipeStream { get; }
 

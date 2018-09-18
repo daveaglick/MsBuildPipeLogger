@@ -10,7 +10,7 @@ namespace MsBuildPipeLogger
 {
     internal abstract class PipeWriter : IDisposable
     {
-        private readonly BlockingCollection<BuildEventArgs> _argsQueue =
+        private readonly BlockingCollection<BuildEventArgs> _queue =
             new BlockingCollection<BuildEventArgs>(new ConcurrentQueue<BuildEventArgs>());
         private readonly AutoResetEvent _doneProcessing = new AutoResetEvent(false);
 
@@ -26,40 +26,47 @@ namespace MsBuildPipeLogger
 
             new Thread(() =>
             {
-                while (!_argsQueue.IsCompleted)
+                BuildEventArgs eventArgs;
+                while((eventArgs = TakeEventArgs()) != null)
                 {
-                    BuildEventArgs eventArgs;
-                    try
-                    {
-                        eventArgs = _argsQueue.Take();
-                    }
-                    catch(InvalidOperationException)
-                    {
-                        break;
-                    }
                     _argsWriter.Write(eventArgs);
+                    _binaryWriter.Flush();
                     _pipeStream.Flush();
                 }
                 _doneProcessing.Set();
             }).Start();
         }
 
-        public void Dispose()
+        private BuildEventArgs TakeEventArgs()
         {
-            if (!_argsQueue.IsAddingCompleted)
+            if (!_queue.IsCompleted)
             {
                 try
                 {
-                    _argsQueue.CompleteAdding();
+                    return _queue.Take();
+                }
+                catch (InvalidOperationException)
+                {
+                }
+            }
+            return null;
+        }
+
+        public void Dispose()
+        {
+            if (!_queue.IsAddingCompleted)
+            {
+                try
+                {
+                    _queue.CompleteAdding();
                     _doneProcessing.WaitOne();
                     _pipeStream.WaitForPipeDrain();
-                    _binaryWriter.Dispose();
                     _pipeStream.Dispose();
                 }
                 catch { }
             }
         }
 
-        public void Write(BuildEventArgs e) => _argsWriter.Write(e);
+        public void Write(BuildEventArgs e) => _queue.Add(e);
     }
 }

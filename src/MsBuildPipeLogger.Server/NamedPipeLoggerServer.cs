@@ -12,12 +12,7 @@ namespace MsBuildPipeLogger
         /// </summary>
         /// <param name="pipeName">The name of the pipe to create.</param>
         public NamedPipeLoggerServer(string pipeName)
-            : base(new NamedPipeServerStream(
-                pipeName,
-                PipeDirection.In,
-                -1,
-                PipeTransmissionMode.Byte,
-                PipeOptions.WriteThrough))
+            : base(new NamedPipeServerStream(pipeName, PipeDirection.In))
         {
         }
 

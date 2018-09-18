@@ -22,11 +22,7 @@ namespace MsBuildPipeLogger
 
         private static PipeStream InitializePipe(string serverName, string pipeName)
         {
-            NamedPipeClientStream pipeStream = new NamedPipeClientStream(
-                serverName,
-                pipeName,
-                PipeDirection.Out,
-                PipeOptions.WriteThrough);
+            NamedPipeClientStream pipeStream = new NamedPipeClientStream(serverName, pipeName, PipeDirection.Out);
             pipeStream.Connect();
             return pipeStream;
         }

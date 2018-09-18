@@ -14,7 +14,7 @@ namespace MsBuildPipeLogger.Tests
     [TestFixture]
     public class IntegrationFixture
     {
-        public static int[] MessageCounts = { 0, 1, 50000 };
+        public static int[] MessageCounts = { 0, 1, 100000 };
 
         [Test]
         public void SerializesData([ValueSource(nameof(MessageCounts))] int messageCount)
@@ -151,6 +151,7 @@ namespace MsBuildPipeLogger.Tests
             {
                 process.WaitForExit();
                 exitCode = process.ExitCode;
+                TestContext.WriteLine($"Exited process {process.Id} with code {exitCode}");
                 process.Close();
             }
             return exitCode;

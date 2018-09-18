@@ -6,7 +6,7 @@ namespace MsBuildPipeLogger
 {
     internal class PipeBuffer : Stream
     {
-        private const int BufferSize = 4096;
+        private const int BufferSize = 8192;
 
         private readonly ConcurrentBag<Buffer> _pool = new ConcurrentBag<Buffer>();
 

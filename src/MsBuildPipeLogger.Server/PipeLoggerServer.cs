@@ -45,6 +45,10 @@ namespace MsBuildPipeLogger
                 {
                     // The client broke the stream so we're done
                 }
+                catch (ObjectDisposedException)
+                {
+                    // The pipe was disposed by the caller
+                }
 
                 // Add a final 0 (BinaryLogRecordKind.EndOfFile) into the stream in case the BuildEventArgsReader is waiting for a read
                 Buffer.Write(new byte[1] { 0 }, 0, 1);
@@ -69,20 +73,12 @@ namespace MsBuildPipeLogger
                 return false;
             }
 
-            try
+            BuildEventArgs args = _buildEventArgsReader.Read();
+            if (args != null)
             {
-                BuildEventArgs args = _buildEventArgsReader.Read();
-                if (args != null)
-                {
-                    Dispatch(args);
-                    return true;
-                }
+                Dispatch(args);
+                return true;
             }
-            catch (EndOfStreamException)
-            {
-                // Nothing else to read
-            }
-
             return false;
         }
 

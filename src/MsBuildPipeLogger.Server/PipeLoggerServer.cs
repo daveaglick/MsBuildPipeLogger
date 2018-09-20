@@ -69,12 +69,20 @@ namespace MsBuildPipeLogger
                 return false;
             }
 
-            BuildEventArgs args = _buildEventArgsReader.Read();
-            if (args != null)
+            try
             {
-                Dispatch(args);
-                return true;
+                BuildEventArgs args = _buildEventArgsReader.Read();
+                if (args != null)
+                {
+                    Dispatch(args);
+                    return true;
+                }
             }
+            catch (EndOfStreamException)
+            {
+                // Nothing else to read
+            }
+
             return false;
         }
 

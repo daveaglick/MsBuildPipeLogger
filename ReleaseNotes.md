@@ -1,6 +1,10 @@
+# 1.0.2
+
+- [Fix] No longer crashes when caller disposes the server
+
 # 1.0.1
 
-- Greatly improved performance by using buffers and threads for pipe I/O
+- [Refactoring] Greatly improved performance by using buffers and threads for pipe I/O
 
 # 1.0.0
 

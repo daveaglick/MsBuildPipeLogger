@@ -2,7 +2,7 @@
 
 namespace MsBuildPipeLogger
 {
-    internal class AnonymousPipeWriter : PipeWriter
+    public class AnonymousPipeWriter : PipeWriter
     {
         public string Handle { get; }
 

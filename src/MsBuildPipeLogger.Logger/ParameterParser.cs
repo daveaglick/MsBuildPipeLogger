@@ -14,53 +14,53 @@ namespace MsBuildPipeLogger
             Server
         }
 
-        public static PipeWriter GetPipeFromParameters(string rawParameters)
+        public static IPipeWriter GetPipeFromParameters(string parameters)
         {
-            KeyValuePair<ParameterType, string>[] parameters = ParseParameters(rawParameters);
+            KeyValuePair<ParameterType, string>[] segments = ParseParameters(parameters);
 
-            if (parameters.Any(x => string.IsNullOrWhiteSpace(x.Value)))
+            if (segments.Any(x => string.IsNullOrWhiteSpace(x.Value)))
             {
                 throw new LoggerException($"Invalid or empty parameter value");
             }
 
             // Anonymous pipe
-            if (parameters[0].Key == ParameterType.Handle)
+            if (segments[0].Key == ParameterType.Handle)
             {
-                if (parameters.Length > 1)
+                if (segments.Length > 1)
                 {
                     throw new LoggerException("Handle can only be specified as a single parameter");
                 }
-                return new AnonymousPipeWriter(parameters[0].Value);
+                return new AnonymousPipeWriter(segments[0].Value);
             }
 
             // Named pipe
-            if (parameters[0].Key == ParameterType.Name)
+            if (segments[0].Key == ParameterType.Name)
             {
-                if (parameters.Length == 1)
+                if (segments.Length == 1)
                 {
-                    return new NamedPipeWriter(parameters[0].Value);
+                    return new NamedPipeWriter(segments[0].Value);
                 }
-                if (parameters[1].Key != ParameterType.Server)
+                if (segments[1].Key != ParameterType.Server)
                 {
                     throw new LoggerException("Only server and name can be specified for a named pipe");
                 }
-                return new NamedPipeWriter(parameters[1].Value, parameters[0].Value);
+                return new NamedPipeWriter(segments[1].Value, segments[0].Value);
             }
-            if (parameters.Length == 1 || parameters[1].Key != ParameterType.Name)
+            if (segments.Length == 1 || segments[1].Key != ParameterType.Name)
             {
                 throw new LoggerException("Pipe name must be specified for a named pipe");
             }
-            return new NamedPipeWriter(parameters[0].Value, parameters[1].Value);
+            return new NamedPipeWriter(segments[0].Value, segments[1].Value);
         }
 
-        internal static KeyValuePair<ParameterType, string>[] ParseParameters(string rawParameters)
+        internal static KeyValuePair<ParameterType, string>[] ParseParameters(string parameters)
         {
-            string[] parameters = rawParameters.Split(';');
-            if (parameters.Length < 1 || parameters.Length > 2)
+            string[] segments = parameters.Split(';');
+            if (segments.Length < 1 || segments.Length > 2)
             {
                 throw new LoggerException("Unexpected number of parameters");
             }
-            return parameters.Select(x => ParseParameter(x)).ToArray();
+            return segments.Select(x => ParseParameter(x)).ToArray();
         }
 
         private static KeyValuePair<ParameterType, string> ParseParameter(string parameter)

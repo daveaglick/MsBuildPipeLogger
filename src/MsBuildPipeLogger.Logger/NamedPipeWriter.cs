@@ -2,7 +2,7 @@
 
 namespace MsBuildPipeLogger
 {
-    internal class NamedPipeWriter : PipeWriter
+    public class NamedPipeWriter : PipeWriter
     {
         public string ServerName { get; }
 

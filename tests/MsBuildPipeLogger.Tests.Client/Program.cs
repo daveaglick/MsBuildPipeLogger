@@ -12,7 +12,7 @@ namespace MsBuildPipeLogger.Tests.Client
             int messages = int.Parse(args[1]);
             try
             {
-                using (PipeWriter writer = ParameterParser.GetPipeFromParameters(args[0]))
+                using (IPipeWriter writer = ParameterParser.GetPipeFromParameters(args[0]))
                 {
                     writer.Write(new BuildStartedEventArgs($"Testing", "help"));
                     for (int c = 0; c < messages; c++)

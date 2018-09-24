@@ -1,10 +1,5 @@
 ﻿using System;
-using System.IO;
-using System.IO.Pipes;
-using System.Reflection;
-using System.Text;
 using Microsoft.Build.Framework;
-using Microsoft.Build.Logging;
 using Microsoft.Build.Utilities;
 
 namespace MsBuildPipeLogger
@@ -15,23 +10,38 @@ namespace MsBuildPipeLogger
     /// <remarks>
     /// Heavily based on the work of Kirill Osenkov and the MSBuildStructuredLog project.
     /// </remarks>
-    public class PipeLogger : Microsoft.Build.Utilities.Logger
+    public class PipeLogger : Logger
     {
-        private PipeWriter _pipe;
+        protected IPipeWriter Pipe { get; private set; }
 
         public override void Initialize(IEventSource eventSource)
         {
+            InitializeEnvironmentVariables();
+            Pipe = InitializePipeWriter();
+            InitializeEvents(eventSource);
+        }
+
+        protected virtual void InitializeEnvironmentVariables()
+        {
             Environment.SetEnvironmentVariable("MSBUILDTARGETOUTPUTLOGGING", "true");
             Environment.SetEnvironmentVariable("MSBUILDLOGIMPORTS", "1");
+        }
 
-            _pipe = ParameterParser.GetPipeFromParameters(Parameters);
-            eventSource.AnyEventRaised += (_, e) => _pipe.Write(e);
+        protected virtual IPipeWriter InitializePipeWriter() => ParameterParser.GetPipeFromParameters(Parameters);
+
+        protected virtual void InitializeEvents(IEventSource eventSource)
+        {
+            eventSource.AnyEventRaised += (_, e) => Pipe.Write(e);
         }
 
         public override void Shutdown()
         {
             base.Shutdown();
-            _pipe.Dispose();
+            if (Pipe != null)
+            {
+                Pipe.Dispose();
+                Pipe = null;
+            }
         }
     }
 }

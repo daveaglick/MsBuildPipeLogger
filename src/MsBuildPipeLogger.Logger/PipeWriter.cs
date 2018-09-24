@@ -8,7 +8,7 @@ using Microsoft.Build.Logging;
 
 namespace MsBuildPipeLogger
 {
-    internal abstract class PipeWriter : IDisposable
+    public abstract class PipeWriter : IPipeWriter
     {
         private readonly BlockingCollection<BuildEventArgs> _queue =
             new BlockingCollection<BuildEventArgs>(new ConcurrentQueue<BuildEventArgs>());

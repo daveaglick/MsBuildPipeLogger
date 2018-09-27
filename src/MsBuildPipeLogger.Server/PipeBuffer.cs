@@ -113,39 +113,13 @@ namespace MsBuildPipeLogger
 
             public int FillFromStream(Stream stream, CancellationToken cancellationToken)
             {
-                try
+                Count = cancellationToken.Try(() =>
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        Count = 0;
-                    }
-                    else
-                    {
-                        _offset = 0;
-                        Task<int> readTask = stream.ReadAsync(_buffer, _offset, BufferSize, cancellationToken);
-                        readTask.Wait(cancellationToken);
-                        Count = readTask.Status == TaskStatus.Canceled ? 0 : readTask.Result;
-                    }
-                } 
-                catch(TaskCanceledException)
-                {
-                    // Thrown if the task itself was cancelled from inside the read method
-                    Count = 0;
-                }
-                catch (OperationCanceledException)
-                {
-                    // Thrown if the operation was cancelled (I.e., the task didn't deal with cancellation)
-                    Count = 0;
-                }
-                catch (AggregateException ex)
-                {
-                    // Sometimes the cancellation exceptions are thrown in aggregate
-                    if(!(ex.InnerException is TaskCanceledException)
-                        && !(ex.InnerException is OperationCanceledException))
-                    {
-                        throw;
-                    }
-                }
+                    _offset = 0;
+                    Task<int> readTask = stream.ReadAsync(_buffer, _offset, BufferSize, cancellationToken);
+                    readTask.Wait(cancellationToken);
+                    return readTask.Status == TaskStatus.Canceled ? 0 : readTask.Result;
+                }, () => 0);
                 return Count;
             }
 

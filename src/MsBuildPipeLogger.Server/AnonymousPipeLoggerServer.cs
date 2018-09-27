@@ -44,12 +44,6 @@ namespace MsBuildPipeLogger
             // But I can only catch the pipe disposal from cancellation after the handle has been disposed
             Buffer.FillFromStream(PipeStream, CancellationToken);
 
-            // This doesn't actually disconnect, it just disposes the client handle
-            Disconnect();
-        }
-
-        protected override void Disconnect()
-        {
             // Dispose the client handle if we asked for one
             // If we don't do this we won't get notified when the stream closes, see https://stackoverflow.com/q/39682602/807064
             if (_clientHandle != null)

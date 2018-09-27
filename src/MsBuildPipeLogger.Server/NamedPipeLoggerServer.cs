@@ -28,26 +28,7 @@ namespace MsBuildPipeLogger
         {
         }
 
-        protected override void Connect()
-        {
-            try
-            {
-                PipeStream.WaitForConnectionAsync(CancellationToken).Wait();
-            }
-            catch(Exception)
-            {
-                // If something went wrong here, just close it up
-                // This will always throw when the CancellationToken triggers pipe disposal on cancel handler
-                Disconnect();
-            }
-        }
-
-        protected override void Disconnect()
-        {
-            if (PipeStream.IsConnected)
-            {
-                PipeStream.Disconnect();
-            }
-        }
+        protected override void Connect() =>
+            CancellationToken.Try(() => PipeStream.WaitForConnectionAsync(CancellationToken).Wait());
     }
 }

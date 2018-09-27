@@ -64,8 +64,6 @@ namespace MsBuildPipeLogger
                     // The pipe was disposed
                 }
 
-                Disconnect();
-
                 // Add a final 0 (BinaryLogRecordKind.EndOfFile) into the stream in case the BuildEventArgsReader is waiting for a read
                 Buffer.Write(new byte[1] { 0 }, 0, 1);
 
@@ -74,9 +72,7 @@ namespace MsBuildPipeLogger
         }
 
         protected abstract void Connect();
-
-        protected abstract void Disconnect();
-
+        
         /// <inheritdoc/>
         public BuildEventArgs Read()
         {

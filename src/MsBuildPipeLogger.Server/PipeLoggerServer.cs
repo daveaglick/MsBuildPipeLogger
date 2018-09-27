@@ -27,16 +27,29 @@ namespace MsBuildPipeLogger
         /// </summary>
         /// <param name="pipeStream">The pipe to receive events from.</param>
         public PipeLoggerServer(PipeStream pipeStream)
+            : this(pipeStream, CancellationToken.None)
+        {
+        }
+
+        /// <summary>
+        /// Creates a server that receives MSBuild events over a specified pipe.
+        /// </summary>
+        /// <param name="pipeStream">The pipe to receive events from.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that will cancel read operations if triggered.</param>
+        public PipeLoggerServer(PipeStream pipeStream, CancellationToken cancellationToken)
         {
             PipeStream = pipeStream;
             _binaryReader = new BinaryReader(Buffer);
             _buildEventArgsReader = new BuildEventArgsReaderProxy(_binaryReader);
 
+            // Dispose the pipe if cancelled, which will trigger cleanup and the final BinaryLogRecordKind.EndOfFile
+            cancellationToken.Register(() => pipeStream.Dispose());
+
             new Thread(() =>
             {
-                Connect();
                 try
                 {
+                    Connect();
                     while(Buffer.Write(PipeStream))
                     {
                     }
@@ -47,7 +60,7 @@ namespace MsBuildPipeLogger
                 }
                 catch (ObjectDisposedException)
                 {
-                    // The pipe was disposed by the caller
+                    // The pipe was disposed
                 }
 
                 // Add a final 0 (BinaryLogRecordKind.EndOfFile) into the stream in case the BuildEventArgsReader is waiting for a read

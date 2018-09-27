@@ -248,7 +248,6 @@ Task("GitHub")
 
 Task("Docs")
     .Description("Generates and previews the docs.")
-    .IsDependentOn("Build")
     .Does(() =>
     {
         Wyam(new WyamSettings
@@ -262,7 +261,6 @@ Task("Docs")
 
 Task("Netlify")
     .Description("Generates and deploys the docs.")
-    .IsDependentOn("Build")
     .Does(() =>
     {
         var netlifyToken = EnvironmentVariable("NETLIFY_TOKEN");

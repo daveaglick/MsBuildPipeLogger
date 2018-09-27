@@ -38,8 +38,17 @@ namespace MsBuildPipeLogger
 
         protected override void Connect()
         {
-            // Wait for the pipe to send something so we know we're connected
-            Buffer.Write(PipeStream);
+            // Wait for the pipe to connect
+            while(!PipeStream.IsConnected && !CancellationToken.IsCancellationRequested)
+            {
+            }
+
+            // If we haven't triggered cancellation, read from the pipe to initialize it
+            // Otherwise, if cancellation was requested, this might block
+            if (!CancellationToken.IsCancellationRequested)
+            {
+                Buffer.Write(PipeStream);
+            }
 
             // This doesn't actually disconnect, it just disposes the client handle
             Disconnect();

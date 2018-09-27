@@ -13,7 +13,7 @@ namespace MsBuildPipeLogger
     /// Receives MSBuild logging events over a pipe. This is the base class for <see cref="AnonymousPipeLoggerServer"/>
     /// and <see cref="NamedPipeLoggerServer"/>.
     /// </summary>
-    public class PipeLoggerServer : EventArgsDispatcher, IDisposable
+    public abstract class PipeLoggerServer : EventArgsDispatcher, IDisposable
     {
         private readonly BinaryReader _binaryReader;
         private readonly BuildEventArgsReaderProxy _buildEventArgsReader;
@@ -79,13 +79,9 @@ namespace MsBuildPipeLogger
             }).Start();
         }
 
-        protected virtual void Connect()
-        {
-        }
+        protected abstract void Connect();
 
-        protected virtual void Disconnect()
-        {
-        }
+        protected abstract void Disconnect();
 
         /// <summary>
         /// Reads a single event from the pipe. This method blocks until an event is received,

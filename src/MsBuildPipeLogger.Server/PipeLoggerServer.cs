@@ -46,7 +46,7 @@ namespace MsBuildPipeLogger
             CancellationToken = cancellationToken;
 
             // Dispose the pipe if cancelled, which will trigger cleanup and the final BinaryLogRecordKind.EndOfFile
-            cancellationToken.Register(() => pipeStream.Dispose());
+            cancellationToken.Register(() => DisposePipeStream());
 
             new Thread(() =>
             {
@@ -104,11 +104,23 @@ namespace MsBuildPipeLogger
             return false;
         }
 
+        private void DisposePipeStream()
+        {
+            try
+            {
+                PipeStream.Dispose();
+            }
+            catch(ObjectDisposedException)
+            {
+                // Since disposal is one way of cancelling pipe operations, we need to catch disposal exceptions and ignore them
+            }
+        }
+
         /// <inheritdoc/>
         public void Dispose()
         {
             _binaryReader.Dispose();
-            PipeStream.Dispose();
+            DisposePipeStream();
         }
     }
 }

@@ -1,6 +1,9 @@
-# 1.0.4
+# 1.1.0
 
-- [Feature] Support for server read cancellation
+- [Feature] Support for server read cancellation with a `CancellationToken`
+- [Refactoring] Added a `IPipeLoggerServer` interface
+- [Feature] Added `IPipeLoggerServer.ReadAll()` to read all events in one call
+- [Refactoring] Changes `IPipeLoggerServer.Read()` to return the event that was read instead of a `bool`
 
 # 1.0.3
 

@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Threading;
@@ -45,7 +46,21 @@ namespace MsBuildPipeLogger
             // But I can only catch the pipe disposal from cancellation after the handle has been disposed
             try
             {
-                Task initialReadTask = Task.Factory.StartNew(() => Buffer.Write(PipeStream));
+                Task initialReadTask = Task.Factory.StartNew(() =>
+                {
+                    try
+                    {
+                        Buffer.Write(PipeStream);
+                    }
+                    catch (EndOfStreamException)
+                    {
+                        // The client broke the stream so we're done
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        // The pipe was disposed
+                    }
+                });
                 initialReadTask.Wait(CancellationToken);
             }
             catch(TaskCanceledException)

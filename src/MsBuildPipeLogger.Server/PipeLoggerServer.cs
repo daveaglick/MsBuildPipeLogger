@@ -13,14 +13,15 @@ namespace MsBuildPipeLogger
     /// Receives MSBuild logging events over a pipe. This is the base class for <see cref="AnonymousPipeLoggerServer"/>
     /// and <see cref="NamedPipeLoggerServer"/>.
     /// </summary>
-    public abstract class PipeLoggerServer : EventArgsDispatcher, IDisposable
+    public abstract class PipeLoggerServer<TPipeStream> : EventArgsDispatcher, IPipeLoggerServer
+        where TPipeStream : PipeStream
     {
         private readonly BinaryReader _binaryReader;
         private readonly BuildEventArgsReaderProxy _buildEventArgsReader;
-        
+
         internal PipeBuffer Buffer { get; } = new PipeBuffer();
         
-        protected PipeStream PipeStream { get; }
+        protected TPipeStream PipeStream { get; }
 
         protected CancellationToken CancellationToken { get; }
 
@@ -28,7 +29,7 @@ namespace MsBuildPipeLogger
         /// Creates a server that receives MSBuild events over a specified pipe.
         /// </summary>
         /// <param name="pipeStream">The pipe to receive events from.</param>
-        public PipeLoggerServer(PipeStream pipeStream)
+        protected PipeLoggerServer(TPipeStream pipeStream)
             : this(pipeStream, CancellationToken.None)
         {
         }
@@ -38,22 +39,19 @@ namespace MsBuildPipeLogger
         /// </summary>
         /// <param name="pipeStream">The pipe to receive events from.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that will cancel read operations if triggered.</param>
-        public PipeLoggerServer(PipeStream pipeStream, CancellationToken cancellationToken)
+        protected PipeLoggerServer(TPipeStream pipeStream, CancellationToken cancellationToken)
         {
             PipeStream = pipeStream;
             _binaryReader = new BinaryReader(Buffer);
             _buildEventArgsReader = new BuildEventArgsReaderProxy(_binaryReader);
             CancellationToken = cancellationToken;
-
-            // Dispose the pipe if cancelled, which will trigger cleanup and the final BinaryLogRecordKind.EndOfFile
-            cancellationToken.Register(() => DisposePipeStream());
-
+            
             new Thread(() =>
             {
                 try
                 {
                     Connect();
-                    while(Buffer.Write(PipeStream))
+                    while(Buffer.FillFromStream(PipeStream, CancellationToken))
                     {
                     }
                 }
@@ -64,10 +62,6 @@ namespace MsBuildPipeLogger
                 catch (ObjectDisposedException)
                 {
                     // The pipe was disposed
-                }
-                catch (OperationCanceledException)
-                {
-                    // A cancellation bubbled up (probably unhandled from Connect() implementation)
                 }
 
                 Disconnect();
@@ -104,23 +98,11 @@ namespace MsBuildPipeLogger
             return false;
         }
 
-        private void DisposePipeStream()
-        {
-            try
-            {
-                PipeStream.Dispose();
-            }
-            catch(ObjectDisposedException)
-            {
-                // Since disposal is one way of cancelling pipe operations, we need to catch disposal exceptions and ignore them
-            }
-        }
-
         /// <inheritdoc/>
         public void Dispose()
         {
             _binaryReader.Dispose();
-            DisposePipeStream();
+            PipeStream.Dispose();
         }
     }
 }

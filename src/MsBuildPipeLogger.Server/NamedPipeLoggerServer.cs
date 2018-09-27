@@ -7,7 +7,7 @@ namespace MsBuildPipeLogger
     /// <summary>
     /// A server for receiving MSBuild logging events over a named pipe.
     /// </summary>
-    public class NamedPipeLoggerServer : PipeLoggerServer
+    public class NamedPipeLoggerServer : PipeLoggerServer<NamedPipeServerStream>
     {
         /// <summary>
         /// Creates a named pipe server for receiving MSBuild logging events.
@@ -32,7 +32,7 @@ namespace MsBuildPipeLogger
         {
             try
             {
-                ((NamedPipeServerStream)PipeStream).WaitForConnectionAsync(CancellationToken).Wait();
+                PipeStream.WaitForConnectionAsync(CancellationToken).Wait();
             }
             catch(Exception)
             {
@@ -46,7 +46,7 @@ namespace MsBuildPipeLogger
         {
             if (PipeStream.IsConnected)
             {
-                ((NamedPipeServerStream)PipeStream).Disconnect();
+                PipeStream.Disconnect();
             }
         }
     }

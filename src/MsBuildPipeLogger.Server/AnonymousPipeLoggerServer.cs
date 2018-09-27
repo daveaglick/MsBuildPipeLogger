@@ -9,7 +9,7 @@ namespace MsBuildPipeLogger
     /// <summary>
     /// A server for receiving MSBuild logging events over an anonymous pipe.
     /// </summary>
-    public class AnonymousPipeLoggerServer : PipeLoggerServer
+    public class AnonymousPipeLoggerServer : PipeLoggerServer<AnonymousPipeServerStream>
     {
         private string _clientHandle;
 
@@ -35,34 +35,14 @@ namespace MsBuildPipeLogger
         /// on the first call to <see cref="Read"/>.
         /// </summary>
         /// <returns>The client handle as a string.</returns>
-        public string GetClientHandle() =>
-            _clientHandle ?? (_clientHandle = ((AnonymousPipeServerStream)PipeStream).GetClientHandleAsString());
+        public string GetClientHandle() => _clientHandle ?? (_clientHandle = PipeStream.GetClientHandleAsString());
 
         protected override void Connect()
         {
-            // Wait for the first write inside a cancellable task
-            // This is a pretty big hack, but there's a chicken-and-egg problem with the pipe handle
+            // Wait for the first write, there's a chicken-and-egg problem with the pipe handle
             // I can only dispose the local handle after the first pipe read, which blocks
             // But I can only catch the pipe disposal from cancellation after the handle has been disposed
-            try
-            {
-                Task initialReadTask = Task.Factory.StartNew(() =>
-                {
-                    try
-                    {
-                        Buffer.Write(PipeStream);
-                    }
-                    catch (Exception)
-                    {
-                        // The client broke the stream so we're done
-                    }
-                });
-                initialReadTask.Wait(CancellationToken);
-            }
-            catch(TaskCanceledException)
-            {
-                // We cancelled the initial pipe read and killed the task
-            }
+            Buffer.FillFromStream(PipeStream, CancellationToken);
 
             // This doesn't actually disconnect, it just disposes the client handle
             Disconnect();
@@ -74,7 +54,7 @@ namespace MsBuildPipeLogger
             // If we don't do this we won't get notified when the stream closes, see https://stackoverflow.com/q/39682602/807064
             if (_clientHandle != null)
             {
-                ((AnonymousPipeServerStream)PipeStream).DisposeLocalCopyOfClientHandle();
+                PipeStream.DisposeLocalCopyOfClientHandle();
                 _clientHandle = null;
             }
         }

@@ -46,7 +46,7 @@ namespace MsBuildPipeLogger.Tests
             while ((e = reader.Read()) != null)
             {
                 eventArgs.Add(e);
-                if(memory.Position >= memory.Length)
+                if (memory.Position >= memory.Length)
                 {
                     break;
                 }
@@ -78,7 +78,7 @@ namespace MsBuildPipeLogger.Tests
                     // When
                     tokenSource.CancelAfter(1000);  // The call to .Read() below will block so need to set a timeout for cancellation
                     read = server.Read();
-                }                
+                }
             }
 
             // Then
@@ -124,7 +124,7 @@ namespace MsBuildPipeLogger.Tests
             eventArgs.First().ShouldBeOfType<BuildStartedEventArgs>();
             eventArgs.First().Message.ShouldBe("Testing");
             int c = 0;
-            foreach(BuildEventArgs eventArg in eventArgs.Skip(1))
+            foreach (BuildEventArgs eventArg in eventArgs.Skip(1))
             {
                 eventArg.ShouldBeOfType<BuildMessageEventArgs>();
                 eventArg.Message.ShouldBe($"Testing {c++}");
@@ -158,7 +158,7 @@ namespace MsBuildPipeLogger.Tests
             }
         }
 
-        private int RunClientProcess(PipeLoggerServer server, string arguments, int messages)
+        private int RunClientProcess(IPipeLoggerServer server, string arguments, int messages)
         {
             Process process = new Process();
             int exitCode;

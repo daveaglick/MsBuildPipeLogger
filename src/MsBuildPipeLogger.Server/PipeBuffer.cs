@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace MsBuildPipeLogger
 {
@@ -12,20 +14,20 @@ namespace MsBuildPipeLogger
 
         private readonly BlockingCollection<Buffer> _queue =
             new BlockingCollection<Buffer>(new ConcurrentQueue<Buffer>());
-
+                
         private Buffer _current;
 
         public void CompleteAdding() => _queue.CompleteAdding();
         
         public bool IsCompleted => _queue.IsCompleted;
         
-        public bool Write(Stream stream)
+        public bool FillFromStream(Stream stream, CancellationToken cancellationToken)
         {
             if (!_pool.TryTake(out Buffer buffer))
             {
                 buffer = new Buffer();
             }
-            if(buffer.Write(stream) == 0)
+            if(buffer.FillFromStream(stream, cancellationToken) == 0)
             {
                 // Didn't write anything, return it to the pool
                 _pool.Add(buffer);
@@ -109,10 +111,41 @@ namespace MsBuildPipeLogger
                 Count = count;
             }
 
-            public int Write(Stream stream)
+            public int FillFromStream(Stream stream, CancellationToken cancellationToken)
             {
-                _offset = 0;
-                Count = stream.Read(_buffer, _offset, BufferSize);
+                try
+                {
+                    if (cancellationToken.IsCancellationRequested)
+                    {
+                        Count = 0;
+                    }
+                    else
+                    {
+                        _offset = 0;
+                        Task<int> readTask = stream.ReadAsync(_buffer, _offset, BufferSize, cancellationToken);
+                        readTask.Wait(cancellationToken);
+                        Count = readTask.Status == TaskStatus.Canceled ? 0 : readTask.Result;
+                    }
+                } 
+                catch(TaskCanceledException)
+                {
+                    // Thrown if the task itself was cancelled from inside the read method
+                    Count = 0;
+                }
+                catch (OperationCanceledException)
+                {
+                    // Thrown if the operation was cancelled (I.e., the task didn't deal with cancellation)
+                    Count = 0;
+                }
+                catch (AggregateException ex)
+                {
+                    // Sometimes the cancellation exceptions are thrown in aggregate
+                    if(!(ex.InnerException is TaskCanceledException)
+                        && !(ex.InnerException is OperationCanceledException))
+                    {
+                        throw;
+                    }
+                }
                 return Count;
             }
 
@@ -134,18 +167,18 @@ namespace MsBuildPipeLogger
 
         public override bool CanWrite => false;
 
-        public override long Length => throw new System.NotImplementedException();
+        public override long Length => throw new NotImplementedException();
 
         public override long Position
         {
-            get => throw new System.NotImplementedException();
-            set => throw new System.NotImplementedException();
+            get => throw new NotImplementedException();
+            set => throw new NotImplementedException();
         }
 
-        public override void Flush() => throw new System.NotImplementedException();
+        public override void Flush() => throw new NotImplementedException();
 
-        public override long Seek(long offset, SeekOrigin origin) => throw new System.NotImplementedException();
+        public override long Seek(long offset, SeekOrigin origin) => throw new NotImplementedException();
 
-        public override void SetLength(long value) => throw new System.NotImplementedException();
+        public override void SetLength(long value) => throw new NotImplementedException();
     }
 }

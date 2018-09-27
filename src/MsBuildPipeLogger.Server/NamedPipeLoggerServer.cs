@@ -1,4 +1,5 @@
-﻿using System.IO.Pipes;
+﻿using System;
+using System.IO.Pipes;
 using System.Threading;
 
 namespace MsBuildPipeLogger
@@ -23,11 +24,30 @@ namespace MsBuildPipeLogger
         /// <param name="pipeName">The name of the pipe to create.</param>
         /// <param name="cancellationToken">A <see cref="CancellationToken"/> that will cancel read operations if triggered.</param>
         public NamedPipeLoggerServer(string pipeName, CancellationToken cancellationToken)
-            : base(new NamedPipeServerStream(pipeName, PipeDirection.In), cancellationToken)
+            : base(new NamedPipeServerStream(pipeName, PipeDirection.In, -1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous), cancellationToken)
         {
         }
 
-        protected override void Connect() =>
-            ((NamedPipeServerStream)PipeStream).WaitForConnectionAsync(CancellationToken).Wait(CancellationToken);
+        protected override void Connect()
+        {
+            try
+            {
+                ((NamedPipeServerStream)PipeStream).WaitForConnectionAsync(CancellationToken).Wait();
+            }
+            catch(Exception)
+            {
+                // If something went wrong here, just close it up
+                // This will always throw when the CancellationToken triggers pipe disposal on cancel handler
+                Disconnect();
+            }
+        }
+
+        protected override void Disconnect()
+        {
+            if (PipeStream.IsConnected)
+            {
+                ((NamedPipeServerStream)PipeStream).Disconnect();
+            }
+        }
     }
 }

@@ -70,6 +70,8 @@ namespace MsBuildPipeLogger
                     // A cancellation bubbled up (probably unhandled from Connect() implementation)
                 }
 
+                Disconnect();
+
                 // Add a final 0 (BinaryLogRecordKind.EndOfFile) into the stream in case the BuildEventArgsReader is waiting for a read
                 Buffer.Write(new byte[1] { 0 }, 0, 1);
 
@@ -78,6 +80,10 @@ namespace MsBuildPipeLogger
         }
 
         protected virtual void Connect()
+        {
+        }
+
+        protected virtual void Disconnect()
         {
         }
 

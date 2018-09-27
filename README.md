@@ -106,5 +106,5 @@ The `MsBuildPipeLogger.Logger` recognizes these parameters, separated by a `;` a
 
 ### A note on concurrency
 
-The `AnonymousPipeLoggerServer.Read()` and `NamedPipeLoggerServer.Read()` methods both block while waiting for additional events. If you need to support concurrency or cancellation, you'll need to wrap this call however is appropriate for your application.
+The `AnonymousPipeLoggerServer.Read()` and `NamedPipeLoggerServer.Read()` methods both block while waiting for events. If you need to support concurrency or cancellation, pass a `CancellationToken` to the server constructors and then cancel it during read operations.
 

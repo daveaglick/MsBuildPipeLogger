@@ -10,6 +10,8 @@ namespace MsBuildPipeLogger
     /// </summary>
     public class NamedPipeLoggerServer : PipeLoggerServer<NamedPipeServerStream>
     {
+        private readonly InterlockedBool _connected = new InterlockedBool(false);
+
         public string PipeName { get; }
 
         /// <summary>
@@ -38,9 +40,7 @@ namespace MsBuildPipeLogger
             PipeStream.WaitForConnection();
             _connected.Set();
         }
-
-        private readonly InterlockedBool _connected = new InterlockedBool(false);
-
+        
         private void CancelConnectionWait()
         {
             if(!_connected.Set())

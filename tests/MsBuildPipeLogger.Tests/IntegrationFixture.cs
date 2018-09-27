@@ -13,6 +13,7 @@ using System.Threading;
 namespace MsBuildPipeLogger.Tests
 {
     [TestFixture]
+    [NonParallelizable]
     public class IntegrationFixture
     {
         public static int[] MessageCounts = { 0, 1, 100000 };

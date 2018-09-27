@@ -1,6 +1,7 @@
 using System.IO;
 using System.IO.Pipes;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace MsBuildPipeLogger
 {
@@ -38,16 +39,18 @@ namespace MsBuildPipeLogger
 
         protected override void Connect()
         {
-            // Wait for the pipe to connect
-            while(!PipeStream.IsConnected && !CancellationToken.IsCancellationRequested)
+            // Wait for the first write inside a cancellable task
+            // This is a pretty big hack, but there's a chicken-and-egg problem with the pipe handle
+            // I can only dispose the local handle after the first pipe read, which blocks
+            // But I can only catch the pipe disposal from cancellation after the handle has been disposed
+            try
             {
+                Task initialReadTask = Task.Factory.StartNew(() => Buffer.Write(PipeStream));
+                initialReadTask.Wait(CancellationToken);
             }
-
-            // If we haven't triggered cancellation, read from the pipe to initialize it
-            // Otherwise, if cancellation was requested, this might block
-            if (!CancellationToken.IsCancellationRequested)
+            catch(TaskCanceledException)
             {
-                Buffer.Write(PipeStream);
+                // We cancelled the initial pipe read and killed the task
             }
 
             // This doesn't actually disconnect, it just disposes the client handle

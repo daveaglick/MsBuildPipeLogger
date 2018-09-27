@@ -1,3 +1,7 @@
+# 1.0.4
+
+- [Feature] Support for server read cancellation
+
 # 1.0.3
 
 - [Refactoring] Made it easier to override the logger and use it as the basis for custom pipe loggers (I.e., filtering events)

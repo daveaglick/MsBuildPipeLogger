@@ -63,7 +63,7 @@ namespace MsBuildPipeLogger
                 });
                 initialReadTask.Wait(CancellationToken);
             }
-            catch(TaskCanceledException)
+            catch(Exception)
             {
                 // We cancelled the initial pipe read and killed the task
             }

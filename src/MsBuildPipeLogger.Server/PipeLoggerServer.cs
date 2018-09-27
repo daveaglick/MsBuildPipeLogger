@@ -110,7 +110,7 @@ namespace MsBuildPipeLogger
             {
                 PipeStream.Dispose();
             }
-            catch(Exception)
+            catch(ObjectDisposedException)
             {
                 // Since disposal is one way of cancelling pipe operations, we need to catch disposal exceptions and ignore them
             }

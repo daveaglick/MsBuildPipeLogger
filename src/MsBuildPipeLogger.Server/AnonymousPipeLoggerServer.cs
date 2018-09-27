@@ -52,18 +52,14 @@ namespace MsBuildPipeLogger
                     {
                         Buffer.Write(PipeStream);
                     }
-                    catch (EndOfStreamException)
+                    catch (Exception)
                     {
                         // The client broke the stream so we're done
-                    }
-                    catch (ObjectDisposedException)
-                    {
-                        // The pipe was disposed
                     }
                 });
                 initialReadTask.Wait(CancellationToken);
             }
-            catch(Exception)
+            catch(TaskCanceledException)
             {
                 // We cancelled the initial pipe read and killed the task
             }

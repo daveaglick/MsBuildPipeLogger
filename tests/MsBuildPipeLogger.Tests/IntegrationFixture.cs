@@ -70,38 +70,38 @@ namespace MsBuildPipeLogger.Tests
         public void AnonymousPipeSupportsCancellation()
         {
             // Given
-            bool read = false;
+            BuildEventArgs buildEvent = null;
             using (CancellationTokenSource tokenSource = new CancellationTokenSource())
             {
                 using (AnonymousPipeLoggerServer server = new AnonymousPipeLoggerServer(tokenSource.Token))
                 {
                     // When
                     tokenSource.CancelAfter(1000);  // The call to .Read() below will block so need to set a timeout for cancellation
-                    read = server.Read();
+                    buildEvent = server.Read();
                 }
             }
 
             // Then
-            read.ShouldBe(false);
+            buildEvent.ShouldBeNull();
         }
 
         [Test]
         public void NamedPipeSupportsCancellation()
         {
             // Given
-            bool read = false;
+            BuildEventArgs buildEvent = null;
             using (CancellationTokenSource tokenSource = new CancellationTokenSource())
             {
                 using (NamedPipeLoggerServer server = new NamedPipeLoggerServer("Foo", tokenSource.Token))
                 {
                     // When
                     tokenSource.CancelAfter(1000);  // The call to .Read() below will block so need to set a timeout for cancellation
-                    read = server.Read();
+                    buildEvent = server.Read();
                 }
             }
 
             // Then
-            read.ShouldBe(false);
+            buildEvent.ShouldBeNull();
         }
 
         [Test]
@@ -179,9 +179,7 @@ namespace MsBuildPipeLogger.Tests
                 TestContext.WriteLine($"Started process {process.Id}");
                 process.BeginOutputReadLine();
 
-                while (server.Read())
-                {
-                }
+                server.ReadAll();
             }
             catch(Exception ex)
             {

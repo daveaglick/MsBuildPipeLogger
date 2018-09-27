@@ -77,25 +77,29 @@ namespace MsBuildPipeLogger
 
         protected abstract void Disconnect();
 
-        /// <summary>
-        /// Reads a single event from the pipe. This method blocks until an event is received,
-        /// there are no more events, or the pipe is closed.
-        /// </summary>
-        /// <returns><c>true</c> if an event was read, <c>false</c> otherwise.</returns>
-        public bool Read()
+        /// <inheritdoc/>
+        public BuildEventArgs Read()
         {
             if(Buffer.IsCompleted)
             {
-                return false;
+                return null;
             }
 
             BuildEventArgs args = _buildEventArgsReader.Read();
             if (args != null)
             {
                 Dispatch(args);
-                return true;
+                return args;
             }
-            return false;
+            return null;
+        }
+
+        /// <inheritdoc/>
+        public void ReadAll()
+        {
+            while(Read() != null)
+            {
+            }
         }
 
         /// <inheritdoc/>

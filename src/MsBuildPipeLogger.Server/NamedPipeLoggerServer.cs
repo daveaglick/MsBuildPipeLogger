@@ -1,4 +1,5 @@
 ﻿using System.IO.Pipes;
+using System.Threading;
 
 namespace MsBuildPipeLogger
 {
@@ -12,11 +13,21 @@ namespace MsBuildPipeLogger
         /// </summary>
         /// <param name="pipeName">The name of the pipe to create.</param>
         public NamedPipeLoggerServer(string pipeName)
-            : base(new NamedPipeServerStream(pipeName, PipeDirection.In))
+            : this(pipeName, CancellationToken.None)
+        {
+        }
+
+        /// <summary>
+        /// Creates a named pipe server for receiving MSBuild logging events.
+        /// </summary>
+        /// <param name="pipeName">The name of the pipe to create.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that will cancel read operations if triggered.</param>
+        public NamedPipeLoggerServer(string pipeName, CancellationToken cancellationToken)
+            : base(new NamedPipeServerStream(pipeName, PipeDirection.In), cancellationToken)
         {
         }
 
         protected override void Connect() =>
-            ((NamedPipeServerStream)PipeStream).WaitForConnection();
+            ((NamedPipeServerStream)PipeStream).WaitForConnectionAsync(CancellationToken).Wait(CancellationToken);
     }
 }

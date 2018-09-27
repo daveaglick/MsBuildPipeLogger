@@ -1,5 +1,6 @@
 using System.IO;
 using System.IO.Pipes;
+using System.Threading;
 
 namespace MsBuildPipeLogger
 {
@@ -14,7 +15,16 @@ namespace MsBuildPipeLogger
         /// Creates an anonymous pipe server for receiving MSBuild logging events.
         /// </summary>
         public AnonymousPipeLoggerServer()
-            : base(new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable))
+            : this(CancellationToken.None)
+        {
+        }
+
+        /// <summary>
+        /// Creates an anonymous pipe server for receiving MSBuild logging events.
+        /// </summary>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> that will cancel read operations if triggered.</param>
+        public AnonymousPipeLoggerServer(CancellationToken cancellationToken)
+            : base(new AnonymousPipeServerStream(PipeDirection.In, HandleInheritability.Inheritable), cancellationToken)
         {
         }
 

@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace MsBuildPipeLogger.Tests
 {
@@ -62,6 +63,44 @@ namespace MsBuildPipeLogger.Tests
                 eventArg.ShouldBeOfType<BuildMessageEventArgs>();
                 eventArg.Message.ShouldBe($"Testing {c++}");
             }
+        }
+
+        [Test]
+        public void AnonymousPipeSupportsCancellation()
+        {
+            // Given
+            bool read = false;
+            using (CancellationTokenSource tokenSource = new CancellationTokenSource())
+            {
+                using (AnonymousPipeLoggerServer server = new AnonymousPipeLoggerServer(tokenSource.Token))
+                {
+                    // When
+                    tokenSource.CancelAfter(1000);  // The call to .Read() below will block so need to set a timeout for cancellation
+                    read = server.Read();
+                }                
+            }
+
+            // Then
+            read.ShouldBe(false);
+        }
+
+        [Test]
+        public void NamedPipeSupportsCancellation()
+        {
+            // Given
+            bool read = false;
+            using (CancellationTokenSource tokenSource = new CancellationTokenSource())
+            {
+                using (NamedPipeLoggerServer server = new NamedPipeLoggerServer("Foo", tokenSource.Token))
+                {
+                    // When
+                    tokenSource.CancelAfter(1000);  // The call to .Read() below will block so need to set a timeout for cancellation
+                    read = server.Read();
+                }
+            }
+
+            // Then
+            read.ShouldBe(false);
         }
 
         [Test]

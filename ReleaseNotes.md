@@ -1,3 +1,5 @@
+# 1.1.2
+
 # 1.1.1
 
 - [Fix] Handles premature stream termination when reading events in the server

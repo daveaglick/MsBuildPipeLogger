@@ -1,5 +1,7 @@
 # 1.1.1
 
+- [Fix] Handles premature stream termination when reading events in the server
+
 # 1.1.0
 
 - [Feature] Support for server read cancellation with a `CancellationToken`

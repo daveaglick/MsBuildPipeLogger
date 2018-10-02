@@ -76,14 +76,14 @@ namespace MsBuildPipeLogger
                 {
                     return false;
                 }
-                try
-                {
+                //try
+                //{
                     _current = _queue.Take();
-                }
-                catch (InvalidOperationException)
-                {
-                    return false;
-                }
+                //}
+                //catch (InvalidOperationException)
+                //{
+                //    return false;
+                //}
             }
             return true;
         }

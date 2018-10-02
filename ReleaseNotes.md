@@ -1,5 +1,7 @@
 # 1.1.2
 
+- [Fix] No longer catches certain error exceptions that actually indicate a problem
+
 # 1.1.1
 
 - [Fix] Handles premature stream termination when reading events in the server

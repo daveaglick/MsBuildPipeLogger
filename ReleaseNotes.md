@@ -1,3 +1,5 @@
+# 1.1.3
+
 # 1.1.2
 
 - [Fix] No longer catches certain error exceptions that actually indicate a problem

@@ -9,12 +9,16 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{812B67C9
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2ACFADCF-39EE-4CD6-B649-BCF364A3B0AB}"
 	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
 		.gitignore = .gitignore
-		appveyor.yml = appveyor.yml
+		azure-pipelines.yml = azure-pipelines.yml
 		build.cake = build.cake
+		daveaglick.ruleset = daveaglick.ruleset
+		Directory.Build.props = Directory.Build.props
 		LICENSE = LICENSE
 		README.md = README.md
 		ReleaseNotes.md = ReleaseNotes.md
+		stylecop.json = stylecop.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsBuildPipeLogger.Logger", "src\MsBuildPipeLogger.Logger\MsBuildPipeLogger.Logger.csproj", "{F7DEEDA0-B1EB-4A4C-B102-367A73AB5F4A}"

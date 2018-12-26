@@ -1,10 +1,10 @@
-﻿using NUnit.Framework;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MsBuildPipeLogger;
-using Shouldly;
 using Microsoft.Build.Framework;
+using MsBuildPipeLogger;
+using NUnit.Framework;
+using Shouldly;
 
 namespace MsBuildPipeLogger.Logger.Tests
 {
@@ -57,11 +57,13 @@ namespace MsBuildPipeLogger.Logger.Tests
             KeyValuePair<ParameterParser.ParameterType, string>[] parts = ParameterParser.ParseParameters(parameters);
 
             // Then
-            parts.ShouldBe(new KeyValuePair<ParameterParser.ParameterType, string>[]
-            {
-                new KeyValuePair<ParameterParser.ParameterType, string>(ParameterParser.ParameterType.Name, "Foo"),
-                new KeyValuePair<ParameterParser.ParameterType, string>(ParameterParser.ParameterType.Server, "Bar")
-            }, true);
+            parts.ShouldBe(
+                new KeyValuePair<ParameterParser.ParameterType, string>[]
+                {
+                    new KeyValuePair<ParameterParser.ParameterType, string>(ParameterParser.ParameterType.Name, "Foo"),
+                    new KeyValuePair<ParameterParser.ParameterType, string>(ParameterParser.ParameterType.Server, "Bar")
+                },
+                true);
         }
 
         [TestCase("")]
@@ -75,7 +77,7 @@ namespace MsBuildPipeLogger.Logger.Tests
         public void ThrowsForInvalidParameters(string parameters)
         {
             // Given, When, Then
-            Should.Throw<LoggerException>(() => ParameterParser.GetPipeFromParameters(parameters));            
+            Should.Throw<LoggerException>(() => ParameterParser.GetPipeFromParameters(parameters));
         }
     }
 }

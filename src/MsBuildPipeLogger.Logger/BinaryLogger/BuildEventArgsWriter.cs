@@ -9,82 +9,83 @@ using Microsoft.Build.Framework.Profiler;
 namespace Microsoft.Build.Logging
 {
     /// <summary>
-    /// Serializes BuildEventArgs-derived objects into a provided BinaryWriter
+    /// Serializes BuildEventArgs-derived objects into a provided BinaryWriter.
     /// </summary>
     internal class BuildEventArgsWriter
     {
-        private readonly BinaryWriter binaryWriter;
+        private readonly BinaryWriter _binaryWriter;
 
         /// <summary>
-        /// Initializes a new instance of BuildEventArgsWriter with a BinaryWriter
+        /// Initializes a new instance of BuildEventArgsWriter with a BinaryWriter.
         /// </summary>
-        /// <param name="binaryWriter">A BinaryWriter to write the BuildEventArgs instances to</param>
+        /// <param name="binaryWriter">A BinaryWriter to write the BuildEventArgs instances to.</param>
         public BuildEventArgsWriter(BinaryWriter binaryWriter)
         {
-            this.binaryWriter = binaryWriter;
+            _binaryWriter = binaryWriter;
         }
 
         /// <summary>
-        /// Write a provided instance of BuildEventArgs to the BinaryWriter
+        /// Write a provided instance of BuildEventArgs to the BinaryWriter.
         /// </summary>
         public void Write(BuildEventArgs e)
         {
-            var type = e.GetType().Name;
+            string type = e.GetType().Name;
 
             // the cases are ordered by most used first for performance
             if (e is BuildMessageEventArgs && type != "ProjectImportedEventArgs" && type != "TargetSkippedEventArgs")
             {
                 Write((BuildMessageEventArgs)e);
             }
-            else if (e is TaskStartedEventArgs)
+            else if (e is TaskStartedEventArgs taskStartedEventArgs)
             {
-                Write((TaskStartedEventArgs)e);
+                Write(taskStartedEventArgs);
             }
-            else if (e is TaskFinishedEventArgs)
+            else if (e is TaskFinishedEventArgs taskFinishedEventArgs)
             {
-                Write((TaskFinishedEventArgs)e);
+                Write(taskFinishedEventArgs);
             }
-            else if (e is TargetStartedEventArgs)
+            else if (e is TargetStartedEventArgs targetStartedEventArgs)
             {
-                Write((TargetStartedEventArgs)e);
+                Write(targetStartedEventArgs);
             }
-            else if (e is TargetFinishedEventArgs)
+            else if (e is TargetFinishedEventArgs targetFinishedEventArgs)
             {
-                Write((TargetFinishedEventArgs)e);
+                Write(targetFinishedEventArgs);
             }
-            else if (e is BuildErrorEventArgs)
+            else if (e is BuildErrorEventArgs buildErrorEventArgs)
             {
-                Write((BuildErrorEventArgs)e);
+                Write(buildErrorEventArgs);
             }
-            else if (e is BuildWarningEventArgs)
+            else if (e is BuildWarningEventArgs buildWarningEventArgs)
             {
-                Write((BuildWarningEventArgs)e);
+                Write(buildWarningEventArgs);
             }
-            else if (e is ProjectStartedEventArgs)
+            else if (e is ProjectStartedEventArgs projectStartedEventArgs)
             {
-                Write((ProjectStartedEventArgs)e);
+                Write(projectStartedEventArgs);
             }
-            else if (e is ProjectFinishedEventArgs)
+            else if (e is ProjectFinishedEventArgs projectFinishedEventArgs)
             {
-                Write((ProjectFinishedEventArgs)e);
+                Write(projectFinishedEventArgs);
             }
-            else if (e is BuildStartedEventArgs)
+            else if (e is BuildStartedEventArgs buildStartedEventArgs)
             {
-                Write((BuildStartedEventArgs)e);
+                Write(buildStartedEventArgs);
             }
-            else if (e is BuildFinishedEventArgs)
+            else if (e is BuildFinishedEventArgs buildFinishedEventArgs)
             {
-                Write((BuildFinishedEventArgs)e);
+                Write(buildFinishedEventArgs);
             }
-            else if (e is ProjectEvaluationStartedEventArgs)
+            else if (e is ProjectEvaluationStartedEventArgs projectEvaluationStartedEventArgs)
             {
-                Write((ProjectEvaluationStartedEventArgs)e);
+                Write(projectEvaluationStartedEventArgs);
             }
-            else if (e is ProjectEvaluationFinishedEventArgs)
+            else if (e is ProjectEvaluationFinishedEventArgs projectEvaluationFinishedEventArgs)
             {
-                Write((ProjectEvaluationFinishedEventArgs)e);
+                Write(projectEvaluationFinishedEventArgs);
             }
-            // The following cases are due to the fact that StructuredLogger.dll 
+
+            // The following cases are due to the fact that StructuredLogger.dll
             // only references MSBuild 14.0 .dlls. The following BuildEventArgs types
             // were only introduced in MSBuild 15.3 so we can't refer to them statically.
             // To still provide a good experience to those who are using the BinaryLogger
@@ -94,51 +95,61 @@ namespace Microsoft.Build.Logging
             // our copies so that it's impossible to tell what wrote these.
             else if (type == "ProjectEvaluationStartedEventArgs")
             {
-                var evaluationStarted = new ProjectEvaluationStartedEventArgs(e.Message);
-                evaluationStarted.BuildEventContext = e.BuildEventContext;
-                evaluationStarted.ProjectFile = Reflector.GetProjectFileFromEvaluationStarted(e);
+                ProjectEvaluationStartedEventArgs evaluationStarted = new ProjectEvaluationStartedEventArgs(e.Message)
+                {
+                    BuildEventContext = e.BuildEventContext,
+                    ProjectFile = Reflector.GetProjectFileFromEvaluationStarted(e)
+                };
                 Write(evaluationStarted);
             }
             else if (type == "ProjectEvaluationFinishedEventArgs")
             {
-                var evaluationFinished = new ProjectEvaluationFinishedEventArgs(e.Message);
-                evaluationFinished.BuildEventContext = e.BuildEventContext;
-                evaluationFinished.ProjectFile = Reflector.GetProjectFileFromEvaluationFinished(e);
+                ProjectEvaluationFinishedEventArgs evaluationFinished = new ProjectEvaluationFinishedEventArgs(e.Message)
+                {
+                    BuildEventContext = e.BuildEventContext,
+                    ProjectFile = Reflector.GetProjectFileFromEvaluationFinished(e)
+                };
                 Write(evaluationFinished);
             }
             else if (type == "ProjectImportedEventArgs")
             {
-                var message = e as BuildMessageEventArgs;
-                var projectImported = new ProjectImportedEventArgs(message.LineNumber, message.ColumnNumber, e.Message);
-                projectImported.BuildEventContext = e.BuildEventContext;
-                projectImported.ProjectFile = message.ProjectFile;
-                projectImported.ImportedProjectFile = Reflector.GetImportedProjectFile(e);
-                projectImported.UnexpandedProject = Reflector.GetUnexpandedProject(e);
+                BuildMessageEventArgs message = e as BuildMessageEventArgs;
+                ProjectImportedEventArgs projectImported = new ProjectImportedEventArgs(message.LineNumber, message.ColumnNumber, e.Message)
+                {
+                    BuildEventContext = e.BuildEventContext,
+                    ProjectFile = message.ProjectFile,
+                    ImportedProjectFile = Reflector.GetImportedProjectFile(e),
+                    UnexpandedProject = Reflector.GetUnexpandedProject(e)
+                };
                 Write(projectImported);
             }
             else if (type == "TargetSkippedEventArgs")
             {
-                var message = e as BuildMessageEventArgs;
-                var targetSkipped = new TargetSkippedEventArgs(e.Message);
-                targetSkipped.BuildEventContext = e.BuildEventContext;
-                targetSkipped.ProjectFile = message.ProjectFile;
-                targetSkipped.TargetName = Reflector.GetTargetNameFromTargetSkipped(e);
-                targetSkipped.TargetFile = Reflector.GetTargetFileFromTargetSkipped(e);
-                targetSkipped.ParentTarget = Reflector.GetParentTargetFromTargetSkipped(e);
-                targetSkipped.BuildReason = Reflector.GetBuildReasonFromTargetSkipped(e);
+                BuildMessageEventArgs message = e as BuildMessageEventArgs;
+                TargetSkippedEventArgs targetSkipped = new TargetSkippedEventArgs(e.Message)
+                {
+                    BuildEventContext = e.BuildEventContext,
+                    ProjectFile = message.ProjectFile,
+                    TargetName = Reflector.GetTargetNameFromTargetSkipped(e),
+                    TargetFile = Reflector.GetTargetFileFromTargetSkipped(e),
+                    ParentTarget = Reflector.GetParentTargetFromTargetSkipped(e),
+                    BuildReason = Reflector.GetBuildReasonFromTargetSkipped(e)
+                };
                 Write(targetSkipped);
             }
             else
             {
                 // convert all unrecognized objects to message
                 // and just preserve the message
-                var buildMessageEventArgs = new BuildMessageEventArgs(
+                BuildMessageEventArgs buildMessageEventArgs = new BuildMessageEventArgs(
                     e.Message,
                     e.HelpKeyword,
                     e.SenderName,
                     MessageImportance.Normal,
-                    e.Timestamp);
-                buildMessageEventArgs.BuildEventContext = e.BuildEventContext ?? BuildEventContext.Invalid;
+                    e.Timestamp)
+                {
+                    BuildEventContext = e.BuildEventContext ?? BuildEventContext.Invalid
+                };
                 Write(buildMessageEventArgs);
             }
         }
@@ -174,7 +185,7 @@ namespace Microsoft.Build.Logging
         private void Write(ProjectEvaluationFinishedEventArgs e)
         {
             Write(BinaryLogRecordKind.ProjectEvaluationFinished);
-            
+
             WriteBuildEventArgsFields(e);
             Write(e.ProjectFile);
 
@@ -183,7 +194,7 @@ namespace Microsoft.Build.Logging
             {
                 Write(e.ProfilerResult.Value.ProfiledLocations.Count);
 
-                foreach (var item in e.ProfilerResult.Value.ProfiledLocations)
+                foreach (KeyValuePair<EvaluationLocation, ProfiledLocation> item in e.ProfilerResult.Value.ProfiledLocations)
                 {
                     Write(item.Key);
                     Write(item.Value);
@@ -306,27 +317,27 @@ namespace Microsoft.Build.Logging
 
         private void Write(BuildMessageEventArgs e)
         {
-            if (e is CriticalBuildMessageEventArgs)
+            if (e is CriticalBuildMessageEventArgs criticalBuildMessageEventArgs)
             {
-                Write((CriticalBuildMessageEventArgs)e);
+                Write(criticalBuildMessageEventArgs);
                 return;
             }
 
-            if (e is TaskCommandLineEventArgs)
+            if (e is TaskCommandLineEventArgs taskCommandLineEventArgs)
             {
-                Write((TaskCommandLineEventArgs)e);
+                Write(taskCommandLineEventArgs);
                 return;
             }
 
-            if (e is ProjectImportedEventArgs)
+            if (e is ProjectImportedEventArgs projectImportedEventArgs)
             {
-                Write((ProjectImportedEventArgs)e);
+                Write(projectImportedEventArgs);
                 return;
             }
 
-            if (e is TargetSkippedEventArgs)
+            if (e is TargetSkippedEventArgs targetSkippedEventArgs)
             {
-                Write((TargetSkippedEventArgs)e);
+                Write(targetSkippedEventArgs);
                 return;
             }
 
@@ -369,7 +380,7 @@ namespace Microsoft.Build.Logging
 
         private void WriteBuildEventArgsFields(BuildEventArgs e)
         {
-            var flags = GetBuildEventArgsFieldFlags(e);
+            BuildEventArgsFieldFlags flags = GetBuildEventArgsFieldFlags(e);
             Write((int)flags);
             WriteBaseFields(e, flags);
         }
@@ -409,7 +420,7 @@ namespace Microsoft.Build.Logging
 
         private void WriteMessageFields(BuildMessageEventArgs e)
         {
-            var flags = GetBuildEventArgsFieldFlags(e);
+            BuildEventArgsFieldFlags flags = GetBuildEventArgsFieldFlags(e);
             flags = GetMessageFlags(e, flags);
 
             Write((int)flags);
@@ -506,7 +517,7 @@ namespace Microsoft.Build.Logging
 
         private static BuildEventArgsFieldFlags GetBuildEventArgsFieldFlags(BuildEventArgs e)
         {
-            var flags = BuildEventArgsFieldFlags.None;
+            BuildEventArgsFieldFlags flags = BuildEventArgsFieldFlags.None;
             if (e.BuildEventContext != null)
             {
                 flags |= BuildEventArgsFieldFlags.BuildEventContext;
@@ -543,12 +554,11 @@ namespace Microsoft.Build.Logging
 
         private void WriteItemList(IEnumerable items)
         {
-            var taskItems = items as IEnumerable<ITaskItem>;
-            if (taskItems != null)
+            if (items is IEnumerable<ITaskItem> taskItems)
             {
                 Write(taskItems.Count());
 
-                foreach (var item in taskItems)
+                foreach (ITaskItem item in taskItems)
                 {
                     Write(item);
                 }
@@ -567,7 +577,7 @@ namespace Microsoft.Build.Logging
                 return;
             }
 
-            var entries = items.OfType<DictionaryEntry>()
+            DictionaryEntry[] entries = items.OfType<DictionaryEntry>()
                 .Where(e => e.Key is string && e.Value is ITaskItem)
                 .ToArray();
             Write(entries.Length);
@@ -602,9 +612,9 @@ namespace Microsoft.Build.Logging
                 return;
             }
 
-            // there are no guarantees that the properties iterator won't change, so 
+            // there are no guarantees that the properties iterator won't change, so
             // take a snapshot and work with the readonly copy
-            var propertiesArray = properties.OfType<DictionaryEntry>().ToArray();
+            DictionaryEntry[] propertiesArray = properties.OfType<DictionaryEntry>().ToArray();
 
             Write(propertiesArray.Length);
 
@@ -618,8 +628,8 @@ namespace Microsoft.Build.Logging
                 else
                 {
                     // to keep the count accurate
-                    Write("");
-                    Write("");
+                    Write(string.Empty);
+                    Write(string.Empty);
                 }
             }
         }
@@ -637,10 +647,10 @@ namespace Microsoft.Build.Logging
 
         private void Write<TKey, TValue>(IEnumerable<KeyValuePair<TKey, TValue>> keyValuePairs)
         {
-            if (keyValuePairs != null && keyValuePairs.Any())
+            if (keyValuePairs?.Any() == true)
             {
                 Write(keyValuePairs.Count());
-                foreach (var kvp in keyValuePairs)
+                foreach (KeyValuePair<TKey, TValue> kvp in keyValuePairs)
                 {
                     Write(kvp.Key.ToString());
                     Write(kvp.Value.ToString());
@@ -659,12 +669,12 @@ namespace Microsoft.Build.Logging
 
         private void Write(int value)
         {
-            Write7BitEncodedInt(binaryWriter, value);
+            Write7BitEncodedInt(_binaryWriter, value);
         }
 
         private void Write(long value)
         {
-            binaryWriter.Write(value);
+            _binaryWriter.Write(value);
         }
 
         private void Write7BitEncodedInt(BinaryWriter writer, int value)
@@ -682,23 +692,23 @@ namespace Microsoft.Build.Logging
 
         private void Write(byte[] bytes)
         {
-            binaryWriter.Write(bytes);
+            _binaryWriter.Write(bytes);
         }
 
         private void Write(bool boolean)
         {
-            binaryWriter.Write(boolean);
+            _binaryWriter.Write(boolean);
         }
 
         private void Write(string text)
         {
             if (text != null)
             {
-                binaryWriter.Write(text);
+                _binaryWriter.Write(text);
             }
             else
             {
-                binaryWriter.Write(false);
+                _binaryWriter.Write(false);
             }
         }
 
@@ -717,13 +727,13 @@ namespace Microsoft.Build.Logging
 
         private void Write(DateTime timestamp)
         {
-            binaryWriter.Write(timestamp.Ticks);
+            _binaryWriter.Write(timestamp.Ticks);
             Write((int)timestamp.Kind);
         }
 
         private void Write(TimeSpan timeSpan)
         {
-            binaryWriter.Write(timeSpan.Ticks);
+            _binaryWriter.Write(timeSpan.Ticks);
         }
 
         private void Write(EvaluationLocation item)

@@ -1,14 +1,14 @@
-﻿using Microsoft.Build.Framework;
-using Microsoft.Build.Logging;
-using NUnit.Framework;
-using Shouldly;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Logging;
+using NUnit.Framework;
+using Shouldly;
 
 namespace MsBuildPipeLogger.Tests
 {
@@ -16,7 +16,7 @@ namespace MsBuildPipeLogger.Tests
     [NonParallelizable]
     public class IntegrationFixture
     {
-        public static int[] MessageCounts = { 0, 1, 100000 };
+        private static readonly int[] MessageCounts = { 0, 1, 100000 };
 
         [Test]
         public void SerializesData([ValueSource(nameof(MessageCounts))] int messageCount)
@@ -56,8 +56,8 @@ namespace MsBuildPipeLogger.Tests
 
             // Then
             eventArgs.Count.ShouldBe(messageCount + 1);
-            eventArgs.First().ShouldBeOfType<BuildStartedEventArgs>();
-            eventArgs.First().Message.ShouldBe("Testing");
+            eventArgs[0].ShouldBeOfType<BuildStartedEventArgs>();
+            eventArgs[0].Message.ShouldBe("Testing");
             int c = 0;
             foreach (BuildEventArgs eventArg in eventArgs.Skip(1))
             {
@@ -121,8 +121,8 @@ namespace MsBuildPipeLogger.Tests
             // Then
             exitCode.ShouldBe(0);
             eventArgs.Count.ShouldBe(messageCount + 1);
-            eventArgs.First().ShouldBeOfType<BuildStartedEventArgs>();
-            eventArgs.First().Message.ShouldBe("Testing");
+            eventArgs[0].ShouldBeOfType<BuildStartedEventArgs>();
+            eventArgs[0].Message.ShouldBe("Testing");
             int c = 0;
             foreach (BuildEventArgs eventArg in eventArgs.Skip(1))
             {
@@ -148,8 +148,8 @@ namespace MsBuildPipeLogger.Tests
             // Then
             exitCode.ShouldBe(0);
             eventArgs.Count.ShouldBe(messageCount + 1);
-            eventArgs.First().ShouldBeOfType<BuildStartedEventArgs>();
-            eventArgs.First().Message.ShouldBe("Testing");
+            eventArgs[0].ShouldBeOfType<BuildStartedEventArgs>();
+            eventArgs[0].Message.ShouldBe("Testing");
             int c = 0;
             foreach (BuildEventArgs eventArg in eventArgs.Skip(1))
             {
@@ -181,9 +181,9 @@ namespace MsBuildPipeLogger.Tests
 
                 server.ReadAll();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                TestContext.WriteLine($"Process error: {ex.ToString()}");
+                TestContext.WriteLine($"Process error: {ex}");
             }
             finally
             {

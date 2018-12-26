@@ -31,8 +31,7 @@ namespace MsBuildPipeLogger
         }
 
         /// <summary>
-        /// Gets the client handle as a string. The local copy of the handle will be automatically disposed
-        /// on the first call to <see cref="Read"/>.
+        /// Gets the client handle as a string. The local copy of the handle will be automatically disposed on the first call to <c>Read</c>.
         /// </summary>
         /// <returns>The client handle as a string.</returns>
         public string GetClientHandle() => _clientHandle ?? (_clientHandle = PipeStream.GetClientHandleAsString());

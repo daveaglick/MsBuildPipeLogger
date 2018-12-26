@@ -6,19 +6,6 @@ namespace MsBuildPipeLogger
 {
     internal static class CancellationTokenExtensions
     {
-        public static void Try(this CancellationToken cancellationToken, Action action) =>
-            cancellationToken.Try(action, null);
-
-        public static void Try(this CancellationToken cancellationToken, Action action, Action cancelled) =>
-            cancellationToken.Try<object>(() =>
-            {
-                action();
-                return null;
-            }, () => null);
-
-        public static TResult Try<TResult>(this CancellationToken cancellationToken, Func<TResult> action) =>
-            cancellationToken.Try(action, null);
-
         public static TResult Try<TResult>(this CancellationToken cancellationToken, Func<TResult> action, Func<TResult> cancelled)
         {
             if (cancellationToken.IsCancellationRequested)
@@ -31,12 +18,12 @@ namespace MsBuildPipeLogger
             }
             catch (TaskCanceledException)
             {
-                // Thrown if the task itself was cancelled from inside the read method
+                // Thrown if the task itself was canceled from inside the read method
                 return cancelled == null ? default(TResult) : cancelled();
             }
             catch (OperationCanceledException)
             {
-                // Thrown if the operation was cancelled (I.e., the task didn't deal with cancellation)
+                // Thrown if the operation was canceled (I.e., the task didn't deal with cancellation)
                 return cancelled == null ? default(TResult) : cancelled();
             }
             catch (AggregateException ex)

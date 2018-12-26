@@ -3,7 +3,7 @@
 namespace Microsoft.Build.Logging
 {
     /// <summary>
-    /// A bitmask to specify which fields on a BuildEventArgs object are present; used in serialization
+    /// A bitmask to specify which fields on a BuildEventArgs object are present; used in serialization.
     /// </summary>
     [Flags]
     internal enum BuildEventArgsFieldFlags

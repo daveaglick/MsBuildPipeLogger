@@ -14,20 +14,20 @@ namespace MsBuildPipeLogger
 
         private readonly BlockingCollection<Buffer> _queue =
             new BlockingCollection<Buffer>(new ConcurrentQueue<Buffer>());
-                
+
         private Buffer _current;
 
         public void CompleteAdding() => _queue.CompleteAdding();
-        
+
         public bool IsCompleted => _queue.IsCompleted;
-        
+
         public bool FillFromStream(Stream stream, CancellationToken cancellationToken)
         {
             if (!_pool.TryTake(out Buffer buffer))
             {
                 buffer = new Buffer();
             }
-            if(buffer.FillFromStream(stream, cancellationToken) == 0)
+            if (buffer.FillFromStream(stream, cancellationToken) == 0)
             {
                 // Didn't write anything, return it to the pool
                 _pool.Add(buffer);
@@ -36,17 +36,17 @@ namespace MsBuildPipeLogger
             _queue.Add(buffer);
             return true;
         }
-        
+
         public override void Write(byte[] buffer, int offset, int count) =>
             _queue.Add(new Buffer(buffer, offset, count));
 
         public override int Read(byte[] buffer, int offset, int count)
         {
             int read = 0;
-            while(read < count)
+            while (read < count)
             {
                 // Ensure a buffer is available
-                if(TakeBuffer())
+                if (TakeBuffer())
                 {
                     // Get as much as we can from the current buffer
                     read += _current.Read(buffer, offset + read, count - read);
@@ -106,13 +106,15 @@ namespace MsBuildPipeLogger
 
             public int FillFromStream(Stream stream, CancellationToken cancellationToken)
             {
-                Count = cancellationToken.Try(() =>
-                {
-                    _offset = 0;
-                    Task<int> readTask = stream.ReadAsync(_buffer, _offset, BufferSize, cancellationToken);
-                    readTask.Wait(cancellationToken);
-                    return readTask.Status == TaskStatus.Canceled ? 0 : readTask.Result;
-                }, () => 0);
+                Count = cancellationToken.Try(
+                    () =>
+                    {
+                        _offset = 0;
+                        Task<int> readTask = stream.ReadAsync(_buffer, _offset, BufferSize, cancellationToken);
+                        readTask.Wait(cancellationToken);
+                        return readTask.Status == TaskStatus.Canceled ? 0 : readTask.Result;
+                    },
+                    () => 0);
                 return Count;
             }
 

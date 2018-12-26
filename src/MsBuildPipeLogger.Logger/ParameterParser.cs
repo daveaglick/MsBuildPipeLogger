@@ -74,8 +74,7 @@ namespace MsBuildPipeLogger
             }
 
             // Parse the parameter name
-            ParameterType parameterType;
-            if(!Enum.TryParse(parts[0].Trim(), true, out parameterType))
+            if (!Enum.TryParse(parts[0].Trim(), true, out ParameterType parameterType))
             {
                 throw new LoggerException($"Invalid parameter name {parts[0]}");
             }

@@ -19,7 +19,6 @@ namespace Microsoft.Build.Framework
         /// </summary>
         public ProjectEvaluationFinishedEventArgs()
         {
-
         }
 
         /// <summary>
@@ -39,7 +38,7 @@ namespace Microsoft.Build.Framework
         /// The result of profiling a project.
         /// </summary>
         /// <remarks>
-        /// Null if profiling is not turned on
+        /// Null if profiling is not turned on.
         /// </remarks>
         public ProfilerResult? ProfilerResult { get; set; }
     }

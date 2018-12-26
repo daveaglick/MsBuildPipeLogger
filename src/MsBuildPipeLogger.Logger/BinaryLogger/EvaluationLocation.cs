@@ -11,44 +11,32 @@ using System.Collections.Generic;
 namespace Microsoft.Build.Framework.Profiler
 {
     /// <summary>
-    /// Evaluation main phases used by the profiler
+    /// Evaluation main phases used by the profiler.
     /// </summary>
     /// <remarks>
-    /// Order matters since the profiler pretty printer orders profiled items from top to bottom using 
-    /// the pass they belong to
+    /// Order matters since the profiler pretty printer orders profiled items from top to bottom using
+    /// the pass they belong to.
     /// </remarks>
     public enum EvaluationPass : byte
     {
-        /// <nodoc/>
         TotalEvaluation = 0,
-        /// <nodoc/>
         TotalGlobbing = 1,
-        /// <nodoc/>
         InitialProperties = 2,
-        /// <nodoc/>
         Properties = 3,
-        /// <nodoc/>
         ItemDefinitionGroups = 4,
-        /// <nodoc/>
         Items = 5,
-        /// <nodoc/>
         LazyItems = 6,
-        /// <nodoc/>
         UsingTasks = 7,
-        /// <nodoc/>
         Targets = 8
     }
 
     /// <summary>
-    /// The kind of the evaluated location being tracked
+    /// The kind of the evaluated location being tracked.
     /// </summary>
     public enum EvaluationLocationKind : byte
     {
-        /// <nodoc/>
         Element = 0,
-        /// <nodoc/>
         Condition = 1,
-        /// <nodoc/>
         Glob = 2
     }
 
@@ -61,20 +49,20 @@ namespace Microsoft.Build.Framework.Profiler
     public struct EvaluationLocation
     {
         /// <summary>
-        /// Default descriptions for locations that are used in case a description is not provided
+        /// Default descriptions for locations that are used in case a description is not provided.
         /// </summary>
         private static readonly Dictionary<EvaluationPass, string> PassDefaultDescription =
             new Dictionary<EvaluationPass, string>
             {
-                {EvaluationPass.TotalEvaluation, "Total evaluation"},
-                {EvaluationPass.TotalGlobbing, "Total evaluation for globbing"},
-                {EvaluationPass.InitialProperties, "Initial properties (pass 0)"},
-                {EvaluationPass.Properties, "Properties (pass 1)"},
-                {EvaluationPass.ItemDefinitionGroups, "Item definition groups (pass 2)"},
-                {EvaluationPass.Items, "Items (pass 3)"},
-                {EvaluationPass.LazyItems, "Lazy items (pass 3.1)"},
-                {EvaluationPass.UsingTasks, "Using tasks (pass 4)"},
-                {EvaluationPass.Targets, "Targets (pass 5)"},
+                { EvaluationPass.TotalEvaluation, "Total evaluation" },
+                { EvaluationPass.TotalGlobbing, "Total evaluation for globbing" },
+                { EvaluationPass.InitialProperties, "Initial properties (pass 0)" },
+                { EvaluationPass.Properties, "Properties (pass 1)" },
+                { EvaluationPass.ItemDefinitionGroups, "Item definition groups (pass 2)" },
+                { EvaluationPass.Items, "Items (pass 3)" },
+                { EvaluationPass.LazyItems, "Lazy items (pass 3.1)" },
+                { EvaluationPass.UsingTasks, "Using tasks (pass 4)" },
+                { EvaluationPass.Targets, "Targets (pass 5)" },
             };
 
         /// <nodoc/>
@@ -108,23 +96,25 @@ namespace Microsoft.Build.Framework.Profiler
         public bool IsEvaluationPass => File == null;
 
         /// <nodoc/>
-        public static EvaluationLocation CreateLocationForCondition(long? parentId, EvaluationPass evaluationPass, string evaluationDescription, string file,
-            int? line, string condition)
+        public static EvaluationLocation CreateLocationForCondition(
+            long? parentId,
+            EvaluationPass evaluationPass,
+            string evaluationDescription,
+            string file,
+            int? line,
+            string condition)
         {
             return new EvaluationLocation(parentId, evaluationPass, evaluationDescription, file, line, "Condition", condition, kind: EvaluationLocationKind.Condition);
         }
 
         /// <nodoc/>
-        //public static EvaluationLocation CreateLocationForProject(long? parentId, EvaluationPass evaluationPass, string evaluationDescription, string file,
-        //    int? line, IProjectElement element)
-        //{
-        //    return new EvaluationLocation(parentId, evaluationPass, evaluationDescription, file, line, element?.ElementName,
-        //        element?.OuterElement, kind: EvaluationLocationKind.Element);
-        //}
-
-        /// <nodoc/>
-        public static EvaluationLocation CreateLocationForGlob(long? parentId, EvaluationPass evaluationPass,
-            string evaluationDescription, string file, int? line, string globDescription)
+        public static EvaluationLocation CreateLocationForGlob(
+            long? parentId,
+            EvaluationPass evaluationPass,
+            string evaluationDescription,
+            string file,
+            int? line,
+            string globDescription)
         {
             return new EvaluationLocation(parentId, evaluationPass, evaluationDescription, file, line, "Glob", globDescription, kind: EvaluationLocationKind.Glob);
         }
@@ -132,22 +122,35 @@ namespace Microsoft.Build.Framework.Profiler
         /// <nodoc/>
         public static EvaluationLocation CreateLocationForAggregatedGlob()
         {
-            return new EvaluationLocation(EvaluationPass.TotalGlobbing,
-                PassDefaultDescription[EvaluationPass.TotalGlobbing], file: null, kind: EvaluationLocationKind.Glob,
-                line: null, elementName: null, elementDescription: null);
+            return new EvaluationLocation(
+                EvaluationPass.TotalGlobbing,
+                PassDefaultDescription[EvaluationPass.TotalGlobbing],
+                file: null,
+                line: null,
+                elementName: null,
+                elementDescription: null,
+                kind: EvaluationLocationKind.Glob);
         }
 
         /// <summary>
-        /// Constructs a generic evaluation location
+        /// Constructs a generic evaluation location.
         /// </summary>
         /// <remarks>
-        /// Used by serialization/deserialization purposes
+        /// Used by serialization/deserialization purposes.
         /// </remarks>
-        public EvaluationLocation(long id, long? parentId, EvaluationPass evaluationPass, string evaluationPassDescription, string file,
-            int? line, string elementName, string elementDescription, EvaluationLocationKind kind)
+        public EvaluationLocation(
+            long id,
+            long? parentId,
+            EvaluationPass evaluationPass,
+            string evaluationPassDescription,
+            string file,
+            int? line,
+            string elementName,
+            string elementDescription,
+            EvaluationLocationKind kind)
         {
             Id = id;
-            ParentId = parentId == EmptyLocation.Id? null : parentId; // The empty location doesn't count as a parent id, since it's just a dummy starting point
+            ParentId = parentId == EmptyLocation.Id ? null : parentId; // The empty location doesn't count as a parent id, since it's just a dummy starting point
             EvaluationPass = evaluationPass;
             EvaluationPassDescription = evaluationPassDescription;
             File = file;
@@ -162,7 +165,7 @@ namespace Microsoft.Build.Framework.Profiler
         /// </summary>
         /// <remarks>
         /// A unique Id gets assigned automatically
-        /// Used by serialization/deserialization purposes
+        /// Used by serialization/deserialization purposes.
         /// </remarks>
         public EvaluationLocation(long? parentId, EvaluationPass evaluationPass, string evaluationPassDescription, string file, int? line, string elementName, string elementDescription, EvaluationLocationKind kind)
             : this(EvaluationIdProvider.GetNextId(), parentId, evaluationPass, evaluationPassDescription, file, line, elementName, elementDescription, kind)
@@ -174,7 +177,7 @@ namespace Microsoft.Build.Framework.Profiler
         /// </summary>
         /// <remarks>
         /// A unique Id gets assigned automatically
-        /// Used by serialization/deserialization purposes
+        /// Used by serialization/deserialization purposes.
         /// </remarks>
         public EvaluationLocation(EvaluationPass evaluationPass, string evaluationPassDescription, string file, int? line, string elementName, string elementDescription, EvaluationLocationKind kind)
             : this(null, evaluationPass, evaluationPassDescription, file, line, elementName, elementDescription, kind)
@@ -185,67 +188,76 @@ namespace Microsoft.Build.Framework.Profiler
         /// An empty location, used as the starting instance.
         /// </summary>
         public static EvaluationLocation EmptyLocation { get; } = CreateEmptyLocation();
-        
+
         /// <nodoc/>
         public EvaluationLocation WithEvaluationPass(EvaluationPass evaluationPass, string passDescription = null)
         {
-            return new EvaluationLocation(this.Id, evaluationPass, passDescription ?? PassDefaultDescription[evaluationPass],
-                this.File, this.Line, this.ElementName, this.ElementDescription, this.Kind);
+            return new EvaluationLocation(
+                Id,
+                evaluationPass,
+                passDescription ?? PassDefaultDescription[evaluationPass],
+                File,
+                Line,
+                ElementName,
+                ElementDescription,
+                Kind);
         }
 
         /// <nodoc/>
         public EvaluationLocation WithParentId(long? parentId)
         {
             // Simple optimization. If the new parent id is the same as the current one, then we just return this
-            if (parentId == this.ParentId)
+            if (parentId == ParentId)
             {
                 return this;
             }
 
-            return new EvaluationLocation(this.Id, parentId, this.EvaluationPass, this.EvaluationPassDescription,
-                this.File, this.Line, this.ElementName, this.ElementDescription, this.Kind);
+            return new EvaluationLocation(
+                Id,
+                parentId,
+                EvaluationPass,
+                EvaluationPassDescription,
+                File,
+                Line,
+                ElementName,
+                ElementDescription,
+                Kind);
         }
 
         /// <nodoc/>
         public EvaluationLocation WithFile(string file)
         {
-            return new EvaluationLocation(this.Id, this.EvaluationPass, this.EvaluationPassDescription, file, null, null, null, this.Kind);
+            return new EvaluationLocation(Id, EvaluationPass, EvaluationPassDescription, file, null, null, null, Kind);
         }
-
-        ///// <nodoc/>
-        //public EvaluationLocation WithFileLineAndElement(string file, int? line, IProjectElement element)
-        //{
-        //    return CreateLocationForProject(this.Id, this.EvaluationPass, this.EvaluationPassDescription, file, line, element);
-        //}
 
         /// <nodoc/>
         public EvaluationLocation WithFileLineAndCondition(string file, int? line, string condition)
         {
-            return CreateLocationForCondition(this.Id, this.EvaluationPass, this.EvaluationPassDescription, file, line, condition);
+            return CreateLocationForCondition(Id, EvaluationPass, EvaluationPassDescription, file, line, condition);
         }
 
         /// <nodoc/>
         public EvaluationLocation WithGlob(string globDescription)
         {
-            return CreateLocationForGlob(this.Id, this.EvaluationPass, this.EvaluationPassDescription, this.File, this.Line, globDescription);
+            return CreateLocationForGlob(Id, EvaluationPass, EvaluationPassDescription, File, Line, globDescription);
         }
 
         /// <nodoc/>
         public override bool Equals(object obj)
         {
-            if (obj is EvaluationLocation)
+            if (obj is EvaluationLocation evaluationLocation)
             {
-                var other = (EvaluationLocation) obj;
+                EvaluationLocation other = evaluationLocation;
                 return
-                    Id == other.Id &&
-                    ParentId == other.ParentId &&
-                    EvaluationPass == other.EvaluationPass &&
-                    EvaluationPassDescription == other.EvaluationPassDescription &&
-                    string.Equals(File, other.File, StringComparison.OrdinalIgnoreCase) &&
-                    Line == other.Line &&
-                    ElementName == other.ElementName &&
-                    ElementDescription == other.ElementDescription &&
-					Kind == other.Kind;
+                    Id == other.Id
+                    && ParentId == other.ParentId
+                    && EvaluationPass == other.EvaluationPass
+                    && EvaluationPassDescription == other.EvaluationPassDescription
+                    && string.Equals(File, other.File, StringComparison.OrdinalIgnoreCase)
+                    && Line == other.Line
+                    && ElementName == other.ElementName
+                    && ElementDescription == other.ElementDescription
+                    && Kind == other.Kind;
             }
             return false;
         }
@@ -254,30 +266,37 @@ namespace Microsoft.Build.Framework.Profiler
         public override string ToString()
         {
             return
-                $"{Id}\t{ParentId?.ToString() ?? string.Empty}\t{EvaluationPassDescription ?? string.Empty}\t{File ?? string.Empty}\t{Line?.ToString() ?? string.Empty}\t{ElementName ?? string.Empty}\tDescription:{ElementDescription}\t{this.EvaluationPassDescription}";
+                $"{Id}\t{ParentId?.ToString() ?? string.Empty}\t{EvaluationPassDescription ?? string.Empty}\t{File ?? string.Empty}\t{Line?.ToString() ?? string.Empty}\t{ElementName ?? string.Empty}\tDescription:{ElementDescription}\t{EvaluationPassDescription}";
         }
 
         /// <nodoc/>
         public override int GetHashCode()
         {
-            var hashCode = 1198539463;
-            hashCode = hashCode * -1521134295 + base.GetHashCode();
-            hashCode = hashCode * -1521134295 + Id.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<long?>.Default.GetHashCode(ParentId);
-            hashCode = hashCode * -1521134295 + EvaluationPass.GetHashCode();
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(EvaluationPassDescription);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(File);
-            hashCode = hashCode * -1521134295 + EqualityComparer<int?>.Default.GetHashCode(Line);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ElementName);
-            hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(ElementDescription);
-            hashCode = hashCode * -1521134295 + Kind.GetHashCode();
-            return hashCode;
+            int hashCode = 1198539463;
+            hashCode = (hashCode * -1521134295) + base.GetHashCode();
+            hashCode = (hashCode * -1521134295) + Id.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<long?>.Default.GetHashCode(ParentId);
+            hashCode = (hashCode * -1521134295) + EvaluationPass.GetHashCode();
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(EvaluationPassDescription);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(File);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<int?>.Default.GetHashCode(Line);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(ElementName);
+            hashCode = (hashCode * -1521134295) + EqualityComparer<string>.Default.GetHashCode(ElementDescription);
+            return (hashCode * -1521134295) + Kind.GetHashCode();
         }
 
         private static EvaluationLocation CreateEmptyLocation()
         {
-            return new EvaluationLocation(EvaluationIdProvider.GetNextId(), null, default(EvaluationPass), null, null, null,
-                null, null, default(EvaluationLocationKind));
+            return new EvaluationLocation(
+                EvaluationIdProvider.GetNextId(),
+                null,
+                default(EvaluationPass),
+                null,
+                null,
+                null,
+                null,
+                null,
+                default(EvaluationLocationKind));
         }
     }
 }

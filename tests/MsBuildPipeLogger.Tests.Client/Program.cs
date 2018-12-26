@@ -1,12 +1,12 @@
-﻿using Microsoft.Build.Framework;
-using System;
+﻿using System;
 using System.Diagnostics;
+using Microsoft.Build.Framework;
 
 namespace MsBuildPipeLogger.Tests.Client
 {
     public class Program
     {
-        static int Main(string[] args)
+        public static int Main(string[] args)
         {
             Console.WriteLine(string.Join("; ", args));
             int messages = int.Parse(args[1]);

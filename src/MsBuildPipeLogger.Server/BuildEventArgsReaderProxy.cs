@@ -1,8 +1,8 @@
-﻿using Microsoft.Build.Framework;
-using Microsoft.Build.Logging;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Logging;
 
 namespace MsBuildPipeLogger
 {

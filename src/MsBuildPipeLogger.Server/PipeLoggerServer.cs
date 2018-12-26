@@ -1,11 +1,11 @@
-using Microsoft.Build.Framework;
-using Microsoft.Build.Logging;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
 using System.Text;
 using System.Threading;
+using Microsoft.Build.Framework;
+using Microsoft.Build.Logging;
 
 namespace MsBuildPipeLogger
 {
@@ -20,7 +20,7 @@ namespace MsBuildPipeLogger
         private readonly BuildEventArgsReaderProxy _buildEventArgsReader;
 
         internal PipeBuffer Buffer { get; } = new PipeBuffer();
-        
+
         protected TPipeStream PipeStream { get; }
 
         protected CancellationToken CancellationToken { get; }
@@ -45,13 +45,13 @@ namespace MsBuildPipeLogger
             _binaryReader = new BinaryReader(Buffer);
             _buildEventArgsReader = new BuildEventArgsReaderProxy(_binaryReader);
             CancellationToken = cancellationToken;
-            
+
             new Thread(() =>
             {
                 try
                 {
                     Connect();
-                    while(Buffer.FillFromStream(PipeStream, CancellationToken))
+                    while (Buffer.FillFromStream(PipeStream, CancellationToken))
                     {
                     }
                 }
@@ -72,11 +72,11 @@ namespace MsBuildPipeLogger
         }
 
         protected abstract void Connect();
-        
+
         /// <inheritdoc/>
         public BuildEventArgs Read()
         {
-            if(Buffer.IsCompleted)
+            if (Buffer.IsCompleted)
             {
                 return null;
             }
@@ -90,7 +90,7 @@ namespace MsBuildPipeLogger
                     return args;
                 }
             }
-            catch(EndOfStreamException)
+            catch (EndOfStreamException)
             {
                 // The stream may have been closed or otherwise stopped
             }
@@ -101,7 +101,7 @@ namespace MsBuildPipeLogger
         /// <inheritdoc/>
         public void ReadAll()
         {
-            while(Read() != null)
+            while (Read() != null)
             {
             }
         }

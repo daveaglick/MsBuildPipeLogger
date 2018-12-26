@@ -12,6 +12,7 @@ namespace MsBuildPipeLogger
     {
         private readonly BlockingCollection<BuildEventArgs> _queue =
             new BlockingCollection<BuildEventArgs>(new ConcurrentQueue<BuildEventArgs>());
+
         private readonly AutoResetEvent _doneProcessing = new AutoResetEvent(false);
 
         private readonly PipeStream _pipeStream;
@@ -20,7 +21,7 @@ namespace MsBuildPipeLogger
 
         // Buffer writes through a memory stream since the args writer does a bunch of small writes
         private readonly MemoryStream _memoryStream = new MemoryStream();
-        
+
         protected PipeWriter(PipeStream pipeStream)
         {
             _pipeStream = pipeStream ?? throw new ArgumentNullException(nameof(pipeStream));
@@ -30,7 +31,7 @@ namespace MsBuildPipeLogger
             new Thread(() =>
             {
                 BuildEventArgs eventArgs;
-                while((eventArgs = TakeEventArgs()) != null)
+                while ((eventArgs = TakeEventArgs()) != null)
                 {
                     // Reset the memory stream (but reuse the memory)
                     _memoryStream.Seek(0, SeekOrigin.Begin);
@@ -74,7 +75,9 @@ namespace MsBuildPipeLogger
                     _pipeStream.WaitForPipeDrain();
                     _pipeStream.Dispose();
                 }
-                catch { }
+                catch
+                {
+                }
             }
         }
 

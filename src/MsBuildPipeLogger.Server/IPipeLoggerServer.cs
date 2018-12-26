@@ -1,5 +1,5 @@
-﻿using Microsoft.Build.Framework;
-using System;
+﻿using System;
+using Microsoft.Build.Framework;
 
 namespace MsBuildPipeLogger
 {

@@ -174,8 +174,6 @@ Task("MyGet")
             throw new InvalidOperationException("Could not resolve MyGet API key.");
         }
 
-        Information(mygetKey.Substring(0, 2) + ".." + mygetKey.Substring(mygetKey.Length - 2));
-
         foreach (var nupkg in GetFiles($"{ buildDir }/*.nupkg"))
         {
             NuGetPush(nupkg, new NuGetPushSettings 

@@ -162,7 +162,9 @@ Task("Zip")
 Task("MyGet")
     .Description("Pushes the packages to the MyGet feed.")
     .IsDependentOn("Pack")
+    .WithCriteria(() => !isLocal)
     .WithCriteria(() => !isPullRequest)
+    .WithCriteria(() => isRunningOnWindows)
     .Does(() =>
     {
         // Resolve the API key.

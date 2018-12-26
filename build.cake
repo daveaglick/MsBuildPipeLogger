@@ -8,7 +8,6 @@
 #addin nuget:?package=Cake.Wyam&version=1.5.1
 #addin "Octokit"
 #addin "NetlifySharp"
-#addin "Newtonsoft.Json"
 #tool "AzurePipelines.TestLogger&version=1.0.0"
 #tool "nuget:?package=NuGet.CommandLine&version=4.7.1"
             

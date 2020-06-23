@@ -72,11 +72,24 @@ namespace MsBuildPipeLogger
         {
             if (_current == null)
             {
-                if (_queue.IsCompleted)
+                // Take() can throw when marked as complete from another thread
+                // https://docs.microsoft.com/en-us/dotnet/api/system.collections.concurrent.blockingcollection-1.take?view=netcore-3.1
+                try
+                {
+                    _current = _queue.Take();
+                }
+                catch (ObjectDisposedException)
                 {
                     return false;
                 }
-                _current = _queue.Take();
+                catch (OperationCanceledException)
+                {
+                    return false;
+                }
+                catch (InvalidOperationException)
+                {
+                    return false;
+                }
             }
             return true;
         }

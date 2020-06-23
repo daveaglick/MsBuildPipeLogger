@@ -141,6 +141,23 @@ Task("Pack")
         }
     });
 
+Task("Sign")
+    .IsDependentOn("Pack")
+    .WithCriteria(() => isLocal)
+    .Does(() =>
+    {
+        var certPass = EnvironmentVariable("DAVIDGLICK_CERTPASS");
+        if (string.IsNullOrEmpty(certPass))
+        {
+            throw new InvalidOperationException("Could not resolve certificate password.");
+        }
+
+        foreach (var nupkg in GetFiles($"{ buildDir }/*.nupkg"))
+        {
+            StartProcess("nuget", "sign \"" + nupkg.ToString() + "\" -CertificatePath \"davidglick.pfx\" -CertificatePassword \"" + certPass + "\" -Timestamper \"http://timestamp.digicert.com\" -NonInteractive");
+        }        
+    });
+
 Task("Zip")
     .Description("Zips the build output.")
     .IsDependentOn("Build")
@@ -186,7 +203,7 @@ Task("MyGet")
 
 Task("NuGet")
     .Description("Pushes the packages to the NuGet gallery.")
-    .IsDependentOn("Pack")
+    .IsDependentOn("Sign")
     .WithCriteria(() => isLocal)
     .Does(() =>
     {

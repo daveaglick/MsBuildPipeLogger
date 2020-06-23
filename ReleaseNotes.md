@@ -1,5 +1,7 @@
 # 1.1.3
 
+- [Fix] Fixed a race condition when fetching a log buffer (#1, thanks @duncanawoods)
+
 # 1.1.2
 
 - [Fix] No longer catches certain error exceptions that actually indicate a problem

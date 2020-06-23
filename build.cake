@@ -244,7 +244,7 @@ Task("GitHub")
         {
             Name = semVersion,
             Body = string.Join(Environment.NewLine, releaseNotes.Notes),
-            TargetCommitish = "master"
+            TargetCommitish = "main"
         }).Result;
         
         foreach(var zipFile in GetFiles($"{ buildDir }/*.zip"))
@@ -271,30 +271,6 @@ Task("Docs")
         });  
     });
 
-Task("Netlify")
-    .Description("Generates and deploys the docs.")
-    .Does(() =>
-    {
-        var netlifyToken = EnvironmentVariable("NETLIFY_TOKEN");
-        if(string.IsNullOrEmpty(netlifyToken))
-        {
-            throw new Exception("Could not get Netlify token environment variable");
-        }
-        
-        Wyam(new WyamSettings
-        {
-            RootPath = docsDir,
-            Recipe = "Docs",
-            Theme = "Samson",
-            UpdatePackages = true
-        });  
-
-        Information("Deploying output to Netlify");
-        var client = new NetlifyClient(netlifyToken);
-        client.UpdateSite($"{siteName}.netlify.com", MakeAbsolute(docsDir).FullPath + "/output").SendAsync().Wait();
-    });
-
-
 //////////////////////////////////////////////////////////////////////
 // TASK TARGETS
 //////////////////////////////////////////////////////////////////////
@@ -305,8 +281,7 @@ Task("Default")
 Task("Release")
     .Description("Generates a GitHub release, pushes the NuGet package, and deploys the docs site.")
     .IsDependentOn("GitHub")
-    .IsDependentOn("NuGet")
-    .IsDependentOn("Netlify");
+    .IsDependentOn("NuGet");
 
 Task("BuildServer")
     .Description("Runs a build from the build server and updates build server data.")

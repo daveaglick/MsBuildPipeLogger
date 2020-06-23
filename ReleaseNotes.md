@@ -1,3 +1,5 @@
+# 1.1.4
+
 # 1.1.3
 
 - [Fix] Fixed a race condition when fetching a log buffer (#1, thanks @duncanawoods)

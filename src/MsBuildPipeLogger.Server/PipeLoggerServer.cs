@@ -101,8 +101,14 @@ namespace MsBuildPipeLogger
         /// <inheritdoc/>
         public void ReadAll()
         {
-            while (Read() != null)
+            BuildEventArgs args = Read();
+            while (args != null)
             {
+                if (args is BuildFinishedEventArgs)
+                {
+                    return;
+                }
+                args = Read();
             }
         }
 
@@ -110,6 +116,7 @@ namespace MsBuildPipeLogger
         public void Dispose()
         {
             _binaryReader.Dispose();
+            Buffer.Dispose();
             PipeStream.Dispose();
         }
     }

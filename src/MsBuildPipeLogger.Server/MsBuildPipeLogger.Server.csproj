@@ -3,13 +3,22 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>MsBuildPipeLogger</RootNamespace>
-    <Authors>Dave Glick</Authors>
+    <Authors>Dave Glick (patched by Leandro)</Authors>
     <Company>Dave Glick</Company>
     <Product />
     <Description>A logger for MSBuild that sends event data over anonymous or named pipes.</Description>
-    <PackageProjectUrl>https://msbuildpipelogger.netlify.com/</PackageProjectUrl>
+    <PackageProjectUrl>https://www.shiftleft.io/</PackageProjectUrl>
     <RepositoryUrl>https://github.com/daveaglick/MsBuildPipeLogger.git</RepositoryUrl>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackOnBuild>true</PackOnBuild>
+    <PackageId>SL_MsbuildPipeLogger.Server</PackageId>
+    <Owners>ShiftLeft Inc</Owners>
+    <Configurations>Release;Debug</Configurations>
+    <PackageVersion>1.0.1</PackageVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType></DebugType>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" Version="15.3.409" />

@@ -72,7 +72,10 @@ namespace MsBuildPipeLogger
                 {
                     _queue.CompleteAdding();
                     _doneProcessing.WaitOne();
-                    _pipeStream.WaitForPipeDrain();
+                    if (IsWindows)
+                    {
+                        _pipeStream.WaitForPipeDrain();
+                    }
                     _pipeStream.Dispose();
                 }
                 catch
@@ -82,5 +85,11 @@ namespace MsBuildPipeLogger
         }
 
         public void Write(BuildEventArgs e) => _queue.Add(e);
+
+        private static readonly bool IsWindows = Environment.OSVersion.Platform == PlatformID.Win32NT ||
+                                                 Environment.OSVersion.Platform == PlatformID.Win32S ||
+                                                 Environment.OSVersion.Platform == PlatformID.Win32Windows ||
+                                                 Environment.OSVersion.Platform == PlatformID.WinCE ||
+                                                 Environment.OSVersion.Platform == PlatformID.Xbox;
     }
 }

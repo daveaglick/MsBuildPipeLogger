@@ -1,3 +1,7 @@
+# 1.1.5
+
+- Added SourceLink support.
+
 # 1.1.4
 
 - Fix to avoid calling `PipeStream.WaitForPipeDrain()` on non-Windows platforms where it's not supported (#3, #7, thanks @xoofx).

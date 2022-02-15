@@ -4,7 +4,7 @@ using Microsoft.Build.Framework;
 
 namespace MsBuildPipeLogger.Tests.Client
 {
-    public class Program
+    internal class Program
     {
         public static int Main(string[] args)
         {

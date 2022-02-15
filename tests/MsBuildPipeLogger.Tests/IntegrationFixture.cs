@@ -67,25 +67,6 @@ namespace MsBuildPipeLogger.Tests
         }
 
         [Test]
-        public void AnonymousPipeSupportsCancellation()
-        {
-            // Given
-            BuildEventArgs buildEvent = null;
-            using (CancellationTokenSource tokenSource = new CancellationTokenSource())
-            {
-                using (AnonymousPipeLoggerServer server = new AnonymousPipeLoggerServer(tokenSource.Token))
-                {
-                    // When
-                    tokenSource.CancelAfter(1000);  // The call to .Read() below will block so need to set a timeout for cancellation
-                    buildEvent = server.Read();
-                }
-            }
-
-            // Then
-            buildEvent.ShouldBeNull();
-        }
-
-        [Test]
         public void NamedPipeSupportsCancellation()
         {
             // Given

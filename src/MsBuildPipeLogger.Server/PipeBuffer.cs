@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.IO;
+using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -119,15 +120,27 @@ namespace MsBuildPipeLogger
 
             public int FillFromStream(Stream stream, CancellationToken cancellationToken)
             {
-                Count = cancellationToken.Try(
-                    () =>
-                    {
-                        _offset = 0;
-                        Task<int> readTask = stream.ReadAsync(_buffer, _offset, BufferSize, cancellationToken);
-                        readTask.Wait(cancellationToken);
-                        return readTask.Status == TaskStatus.Canceled ? 0 : readTask.Result;
-                    },
-                    () => 0);
+                if (stream is AnonymousPipeServerStream || stream is AnonymousPipeClientStream)
+                {
+                    // We can't use ReadAsync with Anonymous PipeStream
+                    // https://github.com/dotnet/runtime/issues/23638
+                    // https://docs.microsoft.com/en-us/windows/win32/ipc/anonymous-pipe-operations
+                    // Asynchronous (overlapped) read and write operations are not supported by anonymous pipes
+                    _offset = 0;
+                    Count = cancellationToken.IsCancellationRequested ? 0 : stream.Read(_buffer, _offset, BufferSize);
+                }
+                else
+                {
+                    Count = cancellationToken.Try(
+                        () =>
+                        {
+                            _offset = 0;
+                            Task<int> readTask = stream.ReadAsync(_buffer, _offset, BufferSize, cancellationToken);
+                            readTask.Wait(cancellationToken);
+                            return readTask.Status == TaskStatus.Canceled ? 0 : readTask.Result;
+                        },
+                        () => 0);
+                }
                 return Count;
             }
 

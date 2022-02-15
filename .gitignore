@@ -297,3 +297,5 @@ docs/config.wyam.dll
 
 # Ignore repos cloned in unit tests
 tests/repos
+
+marvin/

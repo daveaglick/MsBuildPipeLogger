@@ -1,0 +1,8 @@
+ProjectSets:
+  - Name: MsBuildPipeLogger
+    SourceProjects: "src/*/*.csproj"
+    TestProjects: "tests/*/*.csproj"
+    GitHubOwner: "daveaglick"
+    GitHubName: "MsBuildPipeLogger"
+GitHubToken: => GetString("GITHUB_TOKEN")
+NuGetApiKey: => GetString("DAVEAGLICK_NUGET_API_KEY")

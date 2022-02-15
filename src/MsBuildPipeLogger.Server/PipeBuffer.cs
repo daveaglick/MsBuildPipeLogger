@@ -136,8 +136,10 @@ namespace MsBuildPipeLogger
                         {
                             _offset = 0;
                             Task<int> readTask = stream.ReadAsync(_buffer, _offset, BufferSize, cancellationToken);
+#pragma warning disable VSTHRD002 // Synchronously waiting on tasks or awaiters may cause deadlocks. Use await or JoinableTaskFactory.Run instead.
                             readTask.Wait(cancellationToken);
                             return readTask.Status == TaskStatus.Canceled ? 0 : readTask.Result;
+#pragma warning restore VSTHRD002
                         },
                         () => 0);
                 }

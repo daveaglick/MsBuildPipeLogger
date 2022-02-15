@@ -1,5 +1,4 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
   </PropertyGroup>
@@ -14,9 +13,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\MsBuildPipeLogger.Logger\MsBuildPipeLogger.Logger.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="Roslynator.Analyzers" Version="4.0.2" />
-    <PackageReference Update="StyleCop.Analyzers" Version="1.1.118" />
-  </ItemGroup>
-
 </Project>

@@ -1,15 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <RootNamespace>MsBuildPipeLogger</RootNamespace>
-    <Authors>Dave Glick</Authors>
-    <Company>Dave Glick</Company>
-    <Product />
     <Description>A logger for MSBuild that sends event data over anonymous or named pipes.</Description>
-    <PackageProjectUrl>https://msbuildpipelogger.netlify.com/</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/daveaglick/MsBuildPipeLogger.git</RepositoryUrl>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.Build" Version="14.3.0" PrivateAssets="All" />
@@ -28,9 +21,4 @@
       <_Parameter1>MsBuildPipeLogger.Tests.Client</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Update="Roslynator.Analyzers" Version="4.0.2" />
-    <PackageReference Update="StyleCop.Analyzers" Version="1.1.118" />
-  </ItemGroup>
-
 </Project>

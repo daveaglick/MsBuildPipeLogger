@@ -7,22 +7,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5CC6B5A3-CF3
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{812B67C9-1716-4583-B2FF-25C1715D0C58}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "misc", "misc", "{2ACFADCF-39EE-4CD6-B649-BCF364A3B0AB}"
-	ProjectSection(SolutionItems) = preProject
-		.editorconfig = .editorconfig
-		.gitignore = .gitignore
-		azure-pipelines.yml = azure-pipelines.yml
-		build.cake = build.cake
-		build.ps1 = build.ps1
-		daveaglick.ruleset = daveaglick.ruleset
-		Directory.Build.props = Directory.Build.props
-		global.json = global.json
-		LICENSE = LICENSE
-		README.md = README.md
-		ReleaseNotes.md = ReleaseNotes.md
-		stylecop.json = stylecop.json
-	EndProjectSection
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsBuildPipeLogger.Logger", "src\MsBuildPipeLogger.Logger\MsBuildPipeLogger.Logger.csproj", "{F7DEEDA0-B1EB-4A4C-B102-367A73AB5F4A}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MsBuildPipeLogger.Server", "src\MsBuildPipeLogger.Server\MsBuildPipeLogger.Server.csproj", "{19286807-751C-43CE-891A-6E9B9CB7200C}"

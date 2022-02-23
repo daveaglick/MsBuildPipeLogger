@@ -55,7 +55,7 @@ namespace MsBuildPipeLogger
                     {
                     }
                 }
-                catch (EndOfStreamException)
+                catch (IOException)
                 {
                     // The client broke the stream so we're done
                 }

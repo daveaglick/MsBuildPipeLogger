@@ -1,3 +1,7 @@
+# 1.1.6
+
+- Fix for unhandled interrupted system call in `PipeLoggerServer` (#8, #9, thanks @xoofx).
+
 # 1.1.5
 
 - Added SourceLink support.

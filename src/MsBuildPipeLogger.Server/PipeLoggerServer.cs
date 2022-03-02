@@ -46,7 +46,7 @@ namespace MsBuildPipeLogger
             _buildEventArgsReader = new BuildEventArgsReaderProxy(_binaryReader);
             CancellationToken = cancellationToken;
 
-            new Thread(() =>
+            Thread readerThread = new Thread(() =>
             {
                 try
                 {
@@ -55,7 +55,7 @@ namespace MsBuildPipeLogger
                     {
                     }
                 }
-                catch (EndOfStreamException)
+                catch (IOException)
                 {
                     // The client broke the stream so we're done
                 }
@@ -68,7 +68,12 @@ namespace MsBuildPipeLogger
                 Buffer.Write(new byte[1] { 0 }, 0, 1);
 
                 Buffer.CompleteAdding();
-            }).Start();
+            })
+            {
+                IsBackground = true
+            };
+
+            readerThread.Start();
         }
 
         protected abstract void Connect();

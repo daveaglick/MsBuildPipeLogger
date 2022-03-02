@@ -28,7 +28,7 @@ namespace MsBuildPipeLogger
             _binaryWriter = new BinaryWriter(_memoryStream);
             _argsWriter = new BuildEventArgsWriter(_binaryWriter);
 
-            new Thread(() =>
+            Thread writerThread = new Thread(() =>
             {
                 BuildEventArgs eventArgs;
                 while ((eventArgs = TakeEventArgs()) != null)
@@ -46,7 +46,11 @@ namespace MsBuildPipeLogger
                     _pipeStream.Flush();
                 }
                 _doneProcessing.Set();
-            }).Start();
+            })
+            {
+                IsBackground = true,
+            };
+            writerThread.Start();
         }
 
         private BuildEventArgs TakeEventArgs()
